@@ -247,8 +247,8 @@ body{
       </svg>
     </div>
     <div class="mode-copy">
-      <div class="mode-title pixel">GIVE ME SINGLISH</div>
-      <div class="mode-sub pixelish">Talk cock but still clear</div>
+      <div class="mode-title pixel">REWRITE TO SINGLISH</div>
+      <div class="mode-sub pixelish">Improve this prompt</div>
     </div>
   </button>
 
@@ -260,8 +260,8 @@ body{
       </svg>
     </div>
     <div class="mode-copy">
-      <div class="mode-title pixel">GIVE ME STANDARD ENGLISH</div>
-      <div class="mode-sub pixelish">Proper one, no nonsense</div>
+      <div class="mode-title pixel">REWRITE TO CHATGPT PROMPT</div>
+      <div class="mode-sub pixelish">Make it clearer for ChatGPT</div>
     </div>
   </button>
 </div>
@@ -278,15 +278,15 @@ body{
 <div class="output-text terminal" id="singlishOutput">Bro, I'm running a bit late.
 Can we push our meeting to 3pm instead?
 Thanks ah!</div>
-<div class="meta pink"><div><strong>TONE:</strong> Casual, local, direct</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Chats, quick messages, informal use</div></div>
+<div class="meta pink"><div><strong>TONE:</strong> Local, natural, human</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Local rewrites, Singlish phrasing</div></div>
 </div>
 <div class="col">
-<div class="label blue pixel">STANDARD ENGLISH</div>
+<div class="label blue pixel">CHATGPT PROMPT</div>
 <div class="quote blue pixel">“</div>
 <div class="output-text terminal" id="standardOutput">I will be slightly delayed.
 Would it be possible to reschedule our meeting to 3pm?
 Thank you.</div>
-<div class="meta blue"><div><strong>TONE:</strong> Polite, neutral, professional</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Work emails, formal communication</div></div>
+<div class="meta blue"><div><strong>TONE:</strong> Clear, structured, prompt-ready</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Better prompting, cleaner AI requests</div></div>
 </div>
 <div class="col">
 <div class="why-title pixel"><span>WHY THIS WORKS</span><div class="help">?</div></div>
@@ -314,6 +314,7 @@ Thank you.</div>
 
 <div aria-live="polite" class="sg-toast pixel hidden" id="sgToast">SG MODE ACTIVE</div>
 </div>
+
 
 
 <script>
@@ -351,11 +352,9 @@ if (sgModeBtn) {
   });
 }
 
-function generatePrompt(text, mode) {
+function buildSinglishPrompt(text) {
   const clean = text.trim();
-
-  if (mode === 'singlish') {
-    return `Rewrite the following message into natural Singaporean Singlish.
+  return `Rewrite the following message into natural Singaporean Singlish.
 Keep the meaning intact.
 Make it sound local, clear, and human.
 Do not overdo slang or particles.
@@ -363,32 +362,17 @@ Do not turn every line into just "lah".
 
 Text:
 "${clean}"`;
-  }
+}
 
-  if (mode === 'standard') {
-    return `Rewrite the following message into clear, polished Standard English.
-Keep the meaning intact.
-Make it suitable for professional or neutral communication.
+function buildChatGPTPrompt(text) {
+  const clean = text.trim();
+  return `Improve the following prompt for ChatGPT.
+Make it clearer, more specific, and easier for ChatGPT to answer well.
+Preserve the user's original intent.
+Do not overcomplicate it.
+Return only the improved prompt.
 
-Text:
-"${clean}"`;
-  }
-
-  return `Rewrite the following message in two ways:
-
-1) Natural Singaporean Singlish
-- local but still clear
-- not cartoonish
-- not overloaded with particles
-
-2) Clear Standard English
-- polished
-- neutral
-- professional
-
-Return both versions separately.
-
-Text:
+Prompt:
 "${clean}"`;
 }
 
@@ -402,14 +386,14 @@ function updateOutputs(mode = 'both') {
   }
 
   if (mode === 'singlish') {
-    singlishOutput.textContent = generatePrompt(text, 'singlish');
+    singlishOutput.textContent = buildSinglishPrompt(text);
     setMode('singlish');
   } else if (mode === 'standard') {
-    standardOutput.textContent = generatePrompt(text, 'standard');
+    standardOutput.textContent = buildChatGPTPrompt(text);
     setMode('standard');
   } else {
-    singlishOutput.textContent = generatePrompt(text, 'singlish');
-    standardOutput.textContent = generatePrompt(text, 'standard');
+    singlishOutput.textContent = buildSinglishPrompt(text);
+    standardOutput.textContent = buildChatGPTPrompt(text);
   }
 }
 
@@ -428,7 +412,7 @@ if (copyBothBtn) {
     const combined = `SINGLISH PROMPT
 ${singlishOutput.textContent}
 
-STANDARD ENGLISH PROMPT
+CHATGPT PROMPT
 ${standardOutput.textContent}`;
     try {
       await navigator.clipboard.writeText(combined);
