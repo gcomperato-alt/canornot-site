@@ -333,6 +333,17 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 }
 .retro-close:active{transform:translate(1px,1px);}
 
+.retro-close{
+  pointer-events:auto;
+  position:relative;
+  z-index:2;
+}
+.retro-modal-head{
+  position:relative;
+  z-index:2;
+}
+
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -542,6 +553,8 @@ Thank you.</div>
 </main>
 <div aria-live="polite" class="sg-toast pixel hidden" id="sgToast">SG MODE ACTIVE</div>
 </div>
+
+
 <script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
@@ -622,47 +635,13 @@ function updateOutputs(mode = 'both') {
   } else {
     singlishOutput.textContent = buildSinglishPrompt(text);
     standardOutput.textContent = buildChatGPTPrompt(text);
-    
-const modalButtons = document.querySelectorAll('[data-modal]');
-const modalCloseButtons = document.querySelectorAll('[data-close-modal]');
-const modalOverlays = document.querySelectorAll('.modal-overlay');
-
-function closeAllModals() {
-  modalOverlays.forEach(modal => modal.classList.remove('open'));
-}
-
-modalButtons.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const modalId = btn.getAttribute('data-modal');
-    const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('open');
-  });
-});
-
-modalCloseButtons.forEach(btn => {
-  btn.addEventListener('click', () => closeAllModals());
-});
-
-modalOverlays.forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeAllModals();
-  });
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeAllModals();
-});
-
-setMode('both');
-
+    setMode('both');
   }
 }
 
 function getPreferredPrompt() {
   const singlish = (singlishOutput?.textContent || '').trim();
   const chatgpt = (standardOutput?.textContent || '').trim();
-
   if (lastModeUsed === 'singlish') return singlish;
   if (lastModeUsed === 'standard') return chatgpt;
   return chatgpt || singlish;
@@ -703,7 +682,6 @@ if (openChatgptBtn) {
       flashToast('GENERATE A PROMPT FIRST');
       return;
     }
-
     try {
       await navigator.clipboard.writeText(prompt);
       const old = openChatgptBtn.innerHTML;
@@ -713,10 +691,44 @@ if (openChatgptBtn) {
     } catch {
       flashToast('COPY FAILED');
     }
-
     window.open('https://chatgpt.com/', '_blank', 'noopener,noreferrer');
   });
 }
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay.open').forEach(modal => modal.classList.remove('open'));
+}
+
+document.addEventListener('click', (e) => {
+  const openTrigger = e.target.closest('[data-modal]');
+  if (openTrigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    const modalId = openTrigger.getAttribute('data-modal');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('open');
+    return;
+  }
+
+  const closeTrigger = e.target.closest('[data-close-modal]');
+  if (closeTrigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    const modal = closeTrigger.closest('.modal-overlay');
+    if (modal) modal.classList.remove('open');
+    else closeAllModals();
+    return;
+  }
+
+  if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+    e.preventDefault();
+    closeAllModals();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAllModals();
+});
 
 setMode('both');
 </script>
