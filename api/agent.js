@@ -68,7 +68,7 @@ Return JSON in exactly this shape:
   "singlish": "string",
   "source": "openai"
 }
-`.trim();
+    `.trim();
 
     const userPrompt = `
 User input:
@@ -85,17 +85,18 @@ Important:
 - Do not merely rewrite a direct factual question unless the route is REFORMULATE or PASS.
 - Keep the answer concise but useful.
 - Return JSON only.
-`.trim();
+    `.trim();
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+        Authorization: \`Bearer \${apiKey}\`
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         temperature: 0.4,
+        response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
