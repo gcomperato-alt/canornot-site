@@ -315,6 +315,7 @@ Thank you.</div>
 <div aria-live="polite" class="sg-toast pixel hidden" id="sgToast">SG MODE ACTIVE</div>
 </div>
 
+
 <script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
@@ -328,7 +329,6 @@ const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
 
 let sgModeOn = true;
-let activeMode = 'singlish';
 
 function flashToast(message) {
   if (!sgToast) return;
@@ -339,7 +339,6 @@ function flashToast(message) {
 }
 
 function setMode(mode) {
-  activeMode = mode;
   if (singlishBtn) singlishBtn.classList.toggle('active', mode === 'singlish');
   if (standardBtn) standardBtn.classList.toggle('active', mode === 'standard');
 }
@@ -352,78 +351,84 @@ if (sgModeBtn) {
   });
 }
 
-async function callRewriteAPI(mode) {
+function generatePrompt(text, mode) {
+  const clean = text.trim();
+
+  if (mode === 'singlish') {
+    return `Rewrite the following message into natural Singaporean Singlish.
+Keep the meaning intact.
+Make it sound local, clear, and human.
+Do not overdo slang or particles.
+Do not turn every line into just "lah".
+
+Text:
+"${clean}"`;
+  }
+
+  if (mode === 'standard') {
+    return `Rewrite the following message into clear, polished Standard English.
+Keep the meaning intact.
+Make it suitable for professional or neutral communication.
+
+Text:
+"${clean}"`;
+  }
+
+  return `Rewrite the following message in two ways:
+
+1) Natural Singaporean Singlish
+- local but still clear
+- not cartoonish
+- not overloaded with particles
+
+2) Clear Standard English
+- polished
+- neutral
+- professional
+
+Return both versions separately.
+
+Text:
+"${clean}"`;
+}
+
+function updateOutputs(mode = 'both') {
   const text = inputText.value.trim();
 
   if (!text) {
-    singlishOutput.textContent = 'Bro, type something first.';
+    singlishOutput.textContent = 'Type something first.';
     standardOutput.textContent = 'Please enter your text above.';
     return;
   }
 
-  if (mode === 'singlish' || mode === 'both') {
-    singlishOutput.textContent = 'Rewriting in Singlish...';
-  }
-  if (mode === 'standard' || mode === 'both') {
-    standardOutput.textContent = 'Rewriting in Standard English...';
-  }
-
-  try {
-    const res = await fetch('/api/rewrite', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, mode })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || 'Request failed');
-    }
-
-    if (mode === 'both') {
-      let parsed;
-      try {
-        parsed = JSON.parse(data.output);
-      } catch {
-        throw new Error('Model did not return valid JSON');
-      }
-
-      singlishOutput.textContent = parsed.singlish || 'No Singlish output.';
-      standardOutput.textContent = parsed.standard || 'No Standard English output.';
-    } else if (mode === 'singlish') {
-      singlishOutput.textContent = data.output;
-      setMode('singlish');
-    } else if (mode === 'standard') {
-      standardOutput.textContent = data.output;
-      setMode('standard');
-    }
-  } catch (err) {
-    if (mode === 'singlish' || mode === 'both') {
-      singlishOutput.textContent = 'Error: ' + err.message;
-    }
-    if (mode === 'standard' || mode === 'both') {
-      standardOutput.textContent = 'Error: ' + err.message;
-    }
+  if (mode === 'singlish') {
+    singlishOutput.textContent = generatePrompt(text, 'singlish');
+    setMode('singlish');
+  } else if (mode === 'standard') {
+    standardOutput.textContent = generatePrompt(text, 'standard');
+    setMode('standard');
+  } else {
+    singlishOutput.textContent = generatePrompt(text, 'singlish');
+    standardOutput.textContent = generatePrompt(text, 'standard');
   }
 }
 
-if (sendBtn) sendBtn.addEventListener('click', () => callRewriteAPI('both'));
-if (singlishBtn) singlishBtn.addEventListener('click', () => callRewriteAPI('singlish'));
-if (standardBtn) standardBtn.addEventListener('click', () => callRewriteAPI('standard'));
+if (sendBtn) sendBtn.addEventListener('click', () => updateOutputs('both'));
+if (singlishBtn) singlishBtn.addEventListener('click', () => updateOutputs('singlish'));
+if (standardBtn) standardBtn.addEventListener('click', () => updateOutputs('standard'));
 
 if (inputText) {
   inputText.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) callRewriteAPI('both');
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) updateOutputs('both');
   });
 }
 
 if (copyBothBtn) {
   copyBothBtn.addEventListener('click', async () => {
-    const combined = `SINGLISH
+    const combined = `SINGLISH PROMPT
 ${singlishOutput.textContent}
 
-STANDARD ENGLISH
+STANDARD ENGLISH PROMPT
 ${standardOutput.textContent}`;
     try {
       await navigator.clipboard.writeText(combined);
