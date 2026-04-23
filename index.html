@@ -562,14 +562,14 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </svg>
 </div>
 <div class="mode-copy">
-<div class="mode-title pixel">REWRITE TO CHATGPT<br/>PROMPT</div>
-<div class="mode-sub">Make it clearer for ChatGPT</div>
+<div class="mode-title pixel">ANSWER OR CLEAR<br/>ENGLISH</div>
+<div class="mode-sub">Answer directly or clarify it</div>
 </div>
 </button>
 </div>
 <section class="output">
 <div class="output-head pixel">
-<div>★ YOUR INPUT, REFINED</div>
+<div>★ ANSWER OR CLEAR VERSION</div>
 <button class="btn copybtn pixel" id="copyBothBtn" type="button"><svg height="15" viewbox="0 0 15 15" width="15"><rect fill="#fff" height="9" stroke="#222" stroke-width="1.5" width="9" x="4" y="4"></rect><rect fill="#ececf3" height="9" stroke="#222" stroke-width="1.5" width="9" x="1" y="1"></rect></svg><span>COPY BOTH</span></button>
 <button class="btn pixel copybtn" id="openChatgptBtn" type="button" style="display:none"><span>COPY &amp; OPEN CHATGPT</span></button>
 </div>
@@ -584,12 +584,12 @@ Thanks ah!</div>
 <div class="meta pink"><div><strong>TONE:</strong> Local, natural, human</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Local rewrites, Singlish phrasing</div></div>
 </div>
 <div class="col">
-<div class="label blue pixel">YOUR INPUT, REFINED</div>
+<div class="label blue pixel">ANSWER / CLEAR VERSION</div>
 <div class="quote blue pixel">“</div>
 <div class="output-text terminal" id="standardOutput">I will be slightly delayed.
 Would it be possible to reschedule our meeting to 3pm?
 Thank you.</div>
-<div class="meta blue"><div><strong>TONE:</strong> Clear, structured, prompt-ready</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Better prompting, cleaner AI requests</div></div>
+<div class="meta blue"><div><strong>TONE:</strong> Direct, clear, structured</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Direct answers, clean English, better prompts</div></div>
 </div>
 <div class="col">
 <div class="why-title pixel"><span>WHY THIS WORKS</span><div class="help">?</div></div>
@@ -634,7 +634,7 @@ Thank you.</div>
   word-break:break-word;
   overflow-wrap:anywhere;
 ">
-  Returned answer will appear here...
+  Route and direct answer will appear here...
 </div>
 
 <div aria-live="polite" class="sg-toast pixel hidden" id="sgToast">SG MODE ACTIVE</div>
@@ -747,26 +747,20 @@ function buildChatGPTPrompt(text) {
 
   if (!clean) return '';
 
-  return `Improve or answer the following user input for ChatGPT.
-
-Keep the original intent.
-Use clear natural English.
-Write in short, readable paragraphs instead of one dense block of text.
-Do not overcomplicate the wording.
-If local context matters, preserve a Singapore-aware framing.
-Return only the final improved prompt or answer.
+  return `Answer this directly if it is a real question.
+If it is rough prompt material, improve it into clear standard English.
 
 User input:
 "${clean}"`;
 }
 
 function getChatGPTDisplayText() {
-  return 'Your prompt is being optimized for the AI.';
+  return 'Answer or clear English will appear here.';
 }
 
 
 const API_PROXY_URL = window.CAN_OR_NOT_API_URL || '/api/agent';
-const ENABLE_LOCAL_FALLBACK = true;
+const ENABLE_LOCAL_FALLBACK = false;
 
 const SINGLISH_SYSTEM = `You are a Singaporean language expert. Rewrite the user's message into natural Singaporean Singlish. Keep the meaning intact. Make it sound local, clear, and human. Do not overdo slang or particles. Do not turn every line into just "lah". Return only the rewritten text, no explanations.`;
 
@@ -843,12 +837,12 @@ function localPromptRewrite(text) {
   }
 
   const prompt = [
-    'Help with the following request.',
+    'Answer this directly if it is a real question.',
+    'If it is rough prompt material, improve it into clear standard English.',
     '',
-    splitIntoParagraphs(clean),
-    '',
-    'Please keep the original intent, make the wording clearer, and respond in short readable paragraphs.'
-  ].join('\n');
+    splitIntoParagraphs(clean)
+  ].join('
+');
 
   return prompt.trim();
 }
@@ -903,6 +897,16 @@ function buildLocalPayload(text, mode) {
   const payload = { route, singlish: '', standard: '', source: 'local-fallback' };
   if (mode === 'singlish' || mode === 'both') payload.singlish = localSinglishRewrite(text);
   if (mode === 'standard' || mode === 'both') payload.standard = localPromptRewrite(text);
+
+  if (route.mode === 'ANSWER') {
+    if (mode === 'singlish' || mode === 'both') {
+      payload.singlish = `I can see this is a direct question, but local fallback mode cannot verify facts online. Backend answer needed for this one.`;
+    }
+    if (mode === 'standard' || mode === 'both') {
+      payload.standard = `This looks like a direct question. The site is currently in local fallback mode, so I cannot safely give a factual answer from the browser alone. Please reconnect the backend.`;
+    }
+  }
+
   return payload;
 }
 
@@ -926,7 +930,7 @@ async function updateOutputs(mode = 'both') {
     if (singlishOutput) singlishOutput.textContent = '⏳ Thinking in Singlish...';
   }
   if (mode === 'standard' || mode === 'both') {
-    if (standardOutput) standardOutput.textContent = '⏳ Refining your prompt...';
+    if (standardOutput) standardOutput.textContent = '⏳ Thinking through your answer...';
   }
 
   try {
@@ -959,7 +963,15 @@ async function updateOutputs(mode = 'both') {
       if (payload?.route?.mode) parts.push(`Mode: ${payload.route.mode}`);
       if (payload?.source) parts.push(`Source: ${payload.source}`);
       if (payload?.route?.reason) parts.push(`Reason: ${payload.route.reason}`);
-      returnedAnswer.textContent = parts.join('\n');
+
+      if (payload?.route?.mode === 'ANSWER' && payload?.standard) {
+        parts.push('');
+        parts.push('Direct answer:');
+        parts.push(payload.standard);
+      }
+
+      returnedAnswer.textContent = parts.join('
+');
     }
   } catch (err) {
     flashToast('ERROR: ' + String(err.message || err).slice(0, 44));
@@ -1114,9 +1126,9 @@ setMode('both');
       <button class="retro-close pixel" type="button" data-close-modal>×</button>
     </div>
     <div class="retro-modal-body">
-      <p>You type your original idea into the input box.</p>
-      <p>The left side helps rewrite it into a more natural Singaporean Singlish style.</p>
-      <p>The right side improves the wording so it becomes a cleaner prompt to paste into ChatGPT.</p>
+      <p>You type your original idea or question into the input box.</p>
+      <p>The left side gives a natural Singaporean Singlish version.</p>
+      <p>The right side either answers your question directly or turns rough wording into clear standard English.</p>
     </div>
   </div>
 </div>
@@ -1129,8 +1141,8 @@ setMode('both');
     </div>
     <div class="retro-modal-body">
       <p>Example one: turn a plain sentence into a more local and human Singlish phrasing.</p>
-      <p>Example two: turn a rough question into a clearer and more useful ChatGPT prompt.</p>
-      <p>The point is not only output, but helping the user shape intention before asking AI.</p>
+      <p>Example two: answer a direct question clearly in standard English.</p>
+      <p>The point is not only rewriting, but helping the user get either a better prompt or a real answer when the question is clear enough.</p>
     </div>
   </div>
 </div>
@@ -1142,9 +1154,9 @@ setMode('both');
       <button class="retro-close pixel" type="button" data-close-modal>×</button>
     </div>
     <div class="retro-modal-body">
-      <p>Can or Not is a lightweight prompt-shaping tool with local flavour.</p>
-      <p>It was built to make interaction with AI clearer, more direct, and more usable for everyday people.</p>
-      <p>The project combines retro interface design, practical prompt engineering, and a simple human-first workflow.</p>
+      <p>Can or Not is a lightweight AI writing and answering tool with local flavour.</p>
+      <p>It was built to make interaction with AI clearer, more direct, and more useful for everyday people.</p>
+      <p>The project combines retro interface design, practical answering, prompt shaping, and a simple human-first workflow.</p>
     </div>
   </div>
 </div>
