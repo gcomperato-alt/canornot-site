@@ -108,6 +108,8 @@ body{
 .output{max-width:1320px; margin:16px auto 0; border:2px solid var(--line); background:#f6f5f9; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c5c3cd;}
 .output-head{height:32px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3)); border-bottom:2px solid var(--line); color:var(--yellow); font-size:10px;}
 .copybtn{display:flex; align-items:center; gap:7px; padding:5px 10px; font-size:10px;}
+.prompt-hint{padding:10px 14px; border-bottom:2px solid #c7c6cf; font-size:18px; line-height:1.15; color:#2b2b33; background:#f2f1f6;}
+.prompt-hint a{color:#2f43c7; text-decoration:underline;}
 .output-grid{display:grid; grid-template-columns:1fr 1fr 330px;}
 .col{padding:16px 18px 14px; min-height:310px; border-right:2px solid #c7c6cf;}
 .col:last-child{border-right:0;}
@@ -270,7 +272,9 @@ body{
 <div class="output-head pixel">
 <div>★ HERE'S YOUR REFORMULATED OUTPUT</div>
 <button class="btn copybtn pixel" id="copyBothBtn" type="button"><svg height="15" viewbox="0 0 15 15" width="15"><rect fill="#fff" height="9" stroke="#222" stroke-width="1.5" width="9" x="4" y="4"></rect><rect fill="#ececf3" height="9" stroke="#222" stroke-width="1.5" width="9" x="1" y="1"></rect></svg><span>COPY BOTH</span></button>
+<button class="btn pixel copybtn" id="openChatgptBtn" type="button"><span>COPY &amp; OPEN CHATGPT</span></button>
 </div>
+<div class="prompt-hint terminal">💡 Paste this into ChatGPT to get your result. <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT homepage</a></div>
 <div class="output-grid">
 <div class="col">
 <div class="label pink pixel">SINGLISH</div>
@@ -317,6 +321,7 @@ Thank you.</div>
 
 
 
+
 <script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
@@ -325,11 +330,13 @@ const sendBtn = document.getElementById('sendBtn');
 const singlishBtn = document.getElementById('singlishBtn');
 const standardBtn = document.getElementById('standardBtn');
 const copyBothBtn = document.getElementById('copyBothBtn');
+const openChatgptBtn = document.getElementById('openChatgptBtn');
 const sgModeBtn = document.getElementById('sgModeBtn');
 const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
 
 let sgModeOn = true;
+let lastModeUsed = 'both';
 
 function flashToast(message) {
   if (!sgToast) return;
@@ -340,6 +347,7 @@ function flashToast(message) {
 }
 
 function setMode(mode) {
+  lastModeUsed = mode;
   if (singlishBtn) singlishBtn.classList.toggle('active', mode === 'singlish');
   if (standardBtn) standardBtn.classList.toggle('active', mode === 'standard');
 }
@@ -394,7 +402,17 @@ function updateOutputs(mode = 'both') {
   } else {
     singlishOutput.textContent = buildSinglishPrompt(text);
     standardOutput.textContent = buildChatGPTPrompt(text);
+    setMode('both');
   }
+}
+
+function getPreferredPrompt() {
+  const singlish = (singlishOutput?.textContent || '').trim();
+  const chatgpt = (standardOutput?.textContent || '').trim();
+
+  if (lastModeUsed === 'singlish') return singlish;
+  if (lastModeUsed === 'standard') return chatgpt;
+  return chatgpt || singlish;
 }
 
 if (sendBtn) sendBtn.addEventListener('click', () => updateOutputs('both'));
@@ -425,7 +443,29 @@ ${standardOutput.textContent}`;
   });
 }
 
-setMode('singlish');
+if (openChatgptBtn) {
+  openChatgptBtn.addEventListener('click', async () => {
+    const prompt = getPreferredPrompt();
+    if (!prompt) {
+      flashToast('GENERATE A PROMPT FIRST');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(prompt);
+      const old = openChatgptBtn.innerHTML;
+      openChatgptBtn.innerHTML = '<span>COPIED &amp; OPENED</span>';
+      setTimeout(() => openChatgptBtn.innerHTML = old, 1200);
+      flashToast('COPIED. PASTE IN CHATGPT');
+    } catch {
+      flashToast('COPY FAILED');
+    }
+
+    window.open('https://chatgpt.com/', '_blank', 'noopener,noreferrer');
+  });
+}
+
+setMode('both');
 </script>
 
 </body>
