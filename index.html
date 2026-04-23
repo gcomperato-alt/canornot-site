@@ -260,6 +260,79 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   opacity:.95;
 }
 
+
+.dropdown-button{
+  width:100%;
+  border:0;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  font-family:'Press Start 2P', monospace;
+}
+.dropdown-button:hover{
+  background:linear-gradient(90deg,var(--purple1),var(--purple3));
+  color:#fff4a8;
+}
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(18,18,34,.28);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:120;
+  padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.retro-modal{
+  width:min(560px, 92vw);
+  border:2px solid var(--line);
+  background:var(--paper);
+  box-shadow:4px 4px 0 rgba(0,0,0,.2), inset 1px 1px 0 #fff, inset -1px -1px 0 #c3c2cc;
+}
+.retro-modal-head{
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 8px;
+  background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3));
+  border-bottom:2px solid var(--line);
+  color:var(--yellow);
+  font-size:10px;
+}
+.retro-modal-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.retro-modal-body{
+  padding:18px 18px 16px 18px;
+  background:#f7f6fb;
+  color:#25252d;
+}
+.retro-modal-body p{
+  margin:0 0 12px 0;
+  font-size:28px;
+  line-height:1.08;
+  font-family:'VT323', monospace;
+}
+.retro-modal-body p:last-child{margin-bottom:0;}
+.retro-close{
+  width:24px;
+  height:24px;
+  border:2px solid var(--line);
+  background:linear-gradient(#f9f8fb,#d8d8e1);
+  color:#444;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  font-size:12px;
+}
+.retro-close:active{transform:translate(1px,1px);}
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -301,8 +374,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
       <svg height="22" viewBox="0 0 22 22" width="22"><path d="M3 10 11 3l8 7v8H13v-5H9v5H3z" fill="#ffcd72" stroke="#222" stroke-width="1.5"></path><path d="M2 10h18" stroke="#222" stroke-width="1.5"></path><path d="M6 18V9h10v9" fill="#f08e98" opacity=".7"></path></svg><span>HOME</span>
     </div>
     <div class="dropdown-menu pixel">
-      <div class="dropdown-item">Main Screen</div>
-      <div class="dropdown-item">Latest Update</div>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-home">Main Screen</button>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-home">Latest Update</button>
     </div>
   </div>
 
@@ -311,8 +384,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
       <svg height="20" viewBox="0 0 24 20" width="24"><path d="M2 5h8l2 2h10v10H2z" fill="#efc858" stroke="#222" stroke-width="1.6"></path><path d="M2 5V3h7l2 2" fill="none" stroke="#222" stroke-width="1.6"></path></svg><span>HOW IT WORKS</span>
     </div>
     <div class="dropdown-menu pixel">
-      <div class="dropdown-item">What This Tool Does</div>
-      <div class="dropdown-item">How To Use It</div>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-how">What This Tool Does</button>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-how">How To Use It</button>
     </div>
   </div>
 
@@ -321,8 +394,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
       <svg height="22" viewBox="0 0 22 22" width="22"><path d="M11 2l2.2 6.3H20l-5.4 3.8 2.1 6.3L11 14.5 5.3 18.4l2.1-6.3L2 8.3h6.8z" fill="#ffd56c" stroke="#222" stroke-width="1.4"></path></svg><span>EXAMPLES</span>
     </div>
     <div class="dropdown-menu pixel">
-      <div class="dropdown-item">Singlish Example</div>
-      <div class="dropdown-item">ChatGPT Prompt Example</div>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-examples">Singlish Example</button>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-examples">ChatGPT Prompt Example</button>
     </div>
   </div>
 
@@ -331,8 +404,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
       <svg height="20" viewBox="0 0 20 20" width="20"><rect fill="#8590ea" height="16" stroke="#222" stroke-width="1.5" width="12" x="4" y="2"></rect><rect fill="#ececf5" height="4" stroke="#222" stroke-width="1" width="8" x="6" y="4"></rect><rect fill="#4c3fd1" height="5" width="6" x="7" y="11"></rect></svg><span>ABOUT</span>
     </div>
     <div class="dropdown-menu pixel">
-      <div class="dropdown-item">Why I Built This</div>
-      <div class="dropdown-item">Project Vision</div>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-about">Why I Built This</button>
+      <button class="dropdown-item dropdown-button pixel" type="button" data-modal="modal-about">Project Vision</button>
     </div>
   </div>
 
@@ -549,7 +622,40 @@ function updateOutputs(mode = 'both') {
   } else {
     singlishOutput.textContent = buildSinglishPrompt(text);
     standardOutput.textContent = buildChatGPTPrompt(text);
-    setMode('both');
+    
+const modalButtons = document.querySelectorAll('[data-modal]');
+const modalCloseButtons = document.querySelectorAll('[data-close-modal]');
+const modalOverlays = document.querySelectorAll('.modal-overlay');
+
+function closeAllModals() {
+  modalOverlays.forEach(modal => modal.classList.remove('open'));
+}
+
+modalButtons.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const modalId = btn.getAttribute('data-modal');
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('open');
+  });
+});
+
+modalCloseButtons.forEach(btn => {
+  btn.addEventListener('click', () => closeAllModals());
+});
+
+modalOverlays.forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeAllModals();
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAllModals();
+});
+
+setMode('both');
+
   }
 }
 
@@ -614,5 +720,62 @@ if (openChatgptBtn) {
 
 setMode('both');
 </script>
+
+<div class="modal-overlay" id="modal-home">
+  <div class="retro-modal">
+    <div class="retro-modal-head pixel">
+      <div class="retro-modal-title"><div class="titleicon"></div><span>HOME</span></div>
+      <button class="retro-close pixel" type="button" data-close-modal>×</button>
+    </div>
+    <div class="retro-modal-body">
+      <p>This is the main screen of Can or Not.</p>
+      <p>It helps people shape text into natural Singlish prompts or clearer ChatGPT-ready prompts without extra clutter.</p>
+      <p>The website is designed as a small retro system where each section feels contained and easy to explore.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-how">
+  <div class="retro-modal">
+    <div class="retro-modal-head pixel">
+      <div class="retro-modal-title"><div class="titleicon"></div><span>HOW IT WORKS</span></div>
+      <button class="retro-close pixel" type="button" data-close-modal>×</button>
+    </div>
+    <div class="retro-modal-body">
+      <p>You type your original idea into the input box.</p>
+      <p>The left side helps rewrite it into a more natural Singaporean Singlish style.</p>
+      <p>The right side improves the wording so it becomes a cleaner prompt to paste into ChatGPT.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-examples">
+  <div class="retro-modal">
+    <div class="retro-modal-head pixel">
+      <div class="retro-modal-title"><div class="titleicon"></div><span>EXAMPLES</span></div>
+      <button class="retro-close pixel" type="button" data-close-modal>×</button>
+    </div>
+    <div class="retro-modal-body">
+      <p>Example one: turn a plain sentence into a more local and human Singlish phrasing.</p>
+      <p>Example two: turn a rough question into a clearer and more useful ChatGPT prompt.</p>
+      <p>The point is not only output, but helping the user shape intention before asking AI.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-about">
+  <div class="retro-modal">
+    <div class="retro-modal-head pixel">
+      <div class="retro-modal-title"><div class="titleicon"></div><span>ABOUT</span></div>
+      <button class="retro-close pixel" type="button" data-close-modal>×</button>
+    </div>
+    <div class="retro-modal-body">
+      <p>Can or Not is a lightweight prompt-shaping tool with local flavour.</p>
+      <p>It was built to make interaction with AI clearer, more direct, and more usable for everyday people.</p>
+      <p>The project combines retro interface design, practical prompt engineering, and a simple human-first workflow.</p>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
