@@ -314,8 +314,8 @@ Thank you.</div>
 
 <div aria-live="polite" class="sg-toast pixel hidden" id="sgToast">SG MODE ACTIVE</div>
 </div>
-<script>
 
+<script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
 const standardOutput = document.getElementById('standardOutput');
@@ -323,33 +323,10 @@ const sendBtn = document.getElementById('sendBtn');
 const singlishBtn = document.getElementById('singlishBtn');
 const standardBtn = document.getElementById('standardBtn');
 const copyBothBtn = document.getElementById('copyBothBtn');
-
-const samplePairs = [
-  {
-    input: "running late can move to 3pm",
-    singlish: "Bro, I’m running a bit late.\nCan we push our meeting to 3pm instead?\nThanks ah!",
-    standard: "I will be slightly delayed.\nWould it be possible to reschedule our meeting to 3pm?\nThank you."
-  },
-  {
-    input: "hello",
-    singlish: "Bro, hello there.\nAll good?",
-    standard: "Hello."
-  },
-  {
-    input: "please send me the details tonight",
-    singlish: "Can send me the details tonight?\nThanks ah!",
-    standard: "Please send me the details tonight."
-  },
-  {
-    input: "i need help with this request",
-    singlish: "Need your help with this request.\nCan help me out?",
-    standard: "I need your help with this request."
-  }
-];
-
 const sgModeBtn = document.getElementById('sgModeBtn');
 const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
+
 let sgModeOn = true;
 let activeMode = 'singlish';
 
@@ -361,6 +338,12 @@ function flashToast(message) {
   window.__sgToastTimer = setTimeout(() => sgToast.classList.add('hidden'), 1400);
 }
 
+function setMode(mode) {
+  activeMode = mode;
+  if (singlishBtn) singlishBtn.classList.toggle('active', mode === 'singlish');
+  if (standardBtn) standardBtn.classList.toggle('active', mode === 'standard');
+}
+
 if (sgModeBtn) {
   sgModeBtn.addEventListener('click', () => {
     sgModeOn = !sgModeOn;
@@ -369,136 +352,92 @@ if (sgModeBtn) {
   });
 }
 
-function normalizeText(text) {
-  return text.replace(/\r/g, '').replace(/[ \t]+/g, ' ').trim();
-}
-
-function sentenceCase(text) {
-  if (!text) return text;
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-function splitSimple(text) {
-  return normalizeText(text)
-    .split(/(?<=[.!?])\s+/)
-    .map(s => s.trim())
-    .filter(Boolean);
-}
-
-function toStandard(text) {
-  let t = normalizeText(text);
-  if (!t) return "Please enter your text above.";
-  const lower = t.toLowerCase();
-  const hit = samplePairs.find(p => p.input === lower);
-  if (hit) return hit.standard;
-
-  t = t
-    .replace(/\bpls\b/gi, 'please')
-    .replace(/\bmsg\b/gi, 'message')
-    .replace(/\bthanks ah\b/gi, 'thank you')
-    .replace(/\b(lah|lor|leh|meh|sia|hor)\b/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  t = sentenceCase(t);
-  if (!/[.!?]$/.test(t)) t += '.';
-  return t;
-}
-
-// Use the phrasing style from the preview file, not the later one-word gimmicks.
-function toSinglish(text) {
-  let t = normalizeText(text);
-  if (!t) return "Bro, type something first.\nThen I can help rewrite it.";
-  const lower = t.toLowerCase();
-  const hit = samplePairs.find(p => p.input === lower);
-  if (hit) return hit.singlish;
-
-  const sentences = splitSimple(t);
-  const first = sentences[0] || t;
-
-  // Preserve the earlier preview rhythm:
-  // 1) direct opening
-  // 2) light follow-up question
-  // 3) friendly close
-  let opener = first.replace(/[.!?]+$/, '');
-  opener = opener
-    .replace(/^i am\b/i, "I’m")
-    .replace(/^i'm\b/i, "I’m")
-    .replace(/\bwould it be possible to\b/gi, 'can')
-    .replace(/\bcould you\b/gi, 'can you')
-    .replace(/\bplease\b/gi, '')
-    .trim();
-
-  opener = sentenceCase(opener);
-
-  if (/^hello$/i.test(opener) || /^hi$/i.test(opener)) {
-    return "Bro, hello there.\nAll good?";
-  }
-
-  let line1 = `Bro, ${opener}.`;
-
-  let line2 = "Can adjust a bit can or not?";
-  if (/meeting|3pm|late/i.test(t)) {
-    line2 = "Can adjust a bit can or not?";
-  } else if (/send|details|tonight/i.test(t)) {
-    line2 = "Can send over tonight can or not?";
-  } else if (/help|request/i.test(t)) {
-    line2 = "Can help me out a bit can or not?";
-  } else if (/review|check/i.test(t)) {
-    line2 = "Can take a look first can or not?";
-  }
-
-  let line3 = "Thanks ah!";
-
-  return `${line1}\n${line2}\n${line3}`;
-}
-
-function setMode(mode) {
-  activeMode = mode;
-  singlishBtn.classList.toggle('active', mode === 'singlish');
-  standardBtn.classList.toggle('active', mode === 'standard');
-}
-
-function updateOutputs(mode='both') {
+async function callRewriteAPI(mode) {
   const text = inputText.value.trim();
+
   if (!text) {
-    singlishOutput.textContent = "Bro, type something first.\nThen I can help rewrite it.";
-    standardOutput.textContent = "Please enter your text above.";
+    singlishOutput.textContent = 'Bro, type something first.';
+    standardOutput.textContent = 'Please enter your text above.';
     return;
   }
-  if (mode === 'singlish') {
-    singlishOutput.textContent = toSinglish(text);
-    setMode('singlish');
-  } else if (mode === 'standard') {
-    standardOutput.textContent = toStandard(text);
-    setMode('standard');
-  } else {
-    singlishOutput.textContent = toSinglish(text);
-    standardOutput.textContent = toStandard(text);
+
+  if (mode === 'singlish' || mode === 'both') {
+    singlishOutput.textContent = 'Rewriting in Singlish...';
+  }
+  if (mode === 'standard' || mode === 'both') {
+    standardOutput.textContent = 'Rewriting in Standard English...';
+  }
+
+  try {
+    const res = await fetch('/api/rewrite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, mode })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Request failed');
+    }
+
+    if (mode === 'both') {
+      let parsed;
+      try {
+        parsed = JSON.parse(data.output);
+      } catch {
+        throw new Error('Model did not return valid JSON');
+      }
+
+      singlishOutput.textContent = parsed.singlish || 'No Singlish output.';
+      standardOutput.textContent = parsed.standard || 'No Standard English output.';
+    } else if (mode === 'singlish') {
+      singlishOutput.textContent = data.output;
+      setMode('singlish');
+    } else if (mode === 'standard') {
+      standardOutput.textContent = data.output;
+      setMode('standard');
+    }
+  } catch (err) {
+    if (mode === 'singlish' || mode === 'both') {
+      singlishOutput.textContent = 'Error: ' + err.message;
+    }
+    if (mode === 'standard' || mode === 'both') {
+      standardOutput.textContent = 'Error: ' + err.message;
+    }
   }
 }
 
-sendBtn.addEventListener('click', () => updateOutputs('both'));
-singlishBtn.addEventListener('click', () => updateOutputs('singlish'));
-standardBtn.addEventListener('click', () => updateOutputs('standard'));
-inputText.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) updateOutputs('both');
-});
+if (sendBtn) sendBtn.addEventListener('click', () => callRewriteAPI('both'));
+if (singlishBtn) singlishBtn.addEventListener('click', () => callRewriteAPI('singlish'));
+if (standardBtn) standardBtn.addEventListener('click', () => callRewriteAPI('standard'));
 
-copyBothBtn.addEventListener('click', async () => {
-  const combined = `SINGLISH\n${singlishOutput.textContent}\n\nSTANDARD ENGLISH\n${standardOutput.textContent}`;
-  try {
-    await navigator.clipboard.writeText(combined);
-    const old = copyBothBtn.innerHTML;
-    copyBothBtn.innerHTML = '<span>COPIED</span>';
-    setTimeout(() => copyBothBtn.innerHTML = old, 1000);
-  } catch {
-    flashToast('COPY NOT AVAILABLE');
-  }
-});
+if (inputText) {
+  inputText.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) callRewriteAPI('both');
+  });
+}
+
+if (copyBothBtn) {
+  copyBothBtn.addEventListener('click', async () => {
+    const combined = `SINGLISH
+${singlishOutput.textContent}
+
+STANDARD ENGLISH
+${standardOutput.textContent}`;
+    try {
+      await navigator.clipboard.writeText(combined);
+      const old = copyBothBtn.innerHTML;
+      copyBothBtn.innerHTML = '<span>COPIED</span>';
+      setTimeout(() => copyBothBtn.innerHTML = old, 1000);
+    } catch {
+      flashToast('COPY NOT AVAILABLE');
+    }
+  });
+}
 
 setMode('singlish');
-
 </script>
+
 </body>
 </html>
