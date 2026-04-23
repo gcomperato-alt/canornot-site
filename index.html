@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Can or Not - AI with Local Flavour</title>
+<title>Can or Not - AI for Locals</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323&amp;display=swap" rel="stylesheet"/>
@@ -39,8 +39,28 @@ body{
 .pixel{font-family:'Press Start 2P', monospace; letter-spacing:.2px;}
 .terminal{font-family:'VT323', monospace;}
 .app{border:2px solid var(--line); background:rgba(255,255,255,.08); min-height:100vh;}
-.titlebar{height:37px; background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3)); border-bottom:2px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 8px; color:#fff4a8;}
-.titleleft{display:flex; align-items:center; gap:10px; min-width:0;}
+.titlebar{
+  min-height:37px;
+  background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3));
+  border-bottom:2px solid var(--line);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:4px 8px;
+  color:#fff4a8;
+  gap:8px;
+}
+.titleleft{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  min-width:0;
+  flex:1;
+}
+.titleleft div:last-child{
+  line-height:1.2;
+  word-break:break-word;
+}
 .titleicon{width:14px; height:14px; border:2px solid #1f2351; background:#fff; box-shadow: inset 0 0 0 2px #d95ca2, inset 0 0 0 4px #786cff;}
 .winbtns{display:flex; gap:3px;}
 .winbtn{width:28px; height:28px; border:2px solid var(--line); background:linear-gradient(#f9f8fb,#d7d6df); display:grid; place-items:center; color:#65606f; font-size:12px;}
@@ -356,6 +376,22 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .footer-item:last-child{padding-right:220px;}
 }
 @media (max-width: 860px){
+  .titlebar{
+    align-items:flex-start;
+    padding:4px 6px;
+  }
+  .titleleft{
+    align-items:flex-start;
+    gap:8px;
+  }
+  .titleleft div:last-child{
+    font-size:10px;
+    line-height:1.25;
+  }
+  .winbtns{
+    flex-shrink:0;
+  }
+
   .navitems{gap:14px;}
   .nav-dropdown{width:100%; align-items:flex-start;}
   .dropdown-menu{position:static; margin-top:6px; min-width:unset; width:100%;}
@@ -374,7 +410,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <body>
 <div class="app">
 <div class="titlebar pixel">
-<div class="titleleft"><div class="titleicon"></div><div>CAN OR NOT - AI WITH LOCAL FLAVOUR</div></div>
+<div class="titleleft"><div class="titleicon"></div><div>CAN OR NOT - AI FOR LOCALS</div></div>
 <div class="winbtns"><div class="winbtn">_</div><div class="winbtn">□</div><div class="winbtn close">×</div></div>
 </div>
 <div class="nav pixel">
