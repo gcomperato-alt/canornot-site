@@ -555,6 +555,7 @@ Thank you.</div>
 </div>
 
 
+
 <script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
@@ -585,21 +586,24 @@ function setMode(mode) {
   if (standardBtn) standardBtn.classList.toggle('active', mode === 'standard');
 }
 
-if (sgModeBtn) {
-  sgModeBtn.addEventListener('click', () => {
-    sgModeOn = !sgModeOn;
-    if (sgModeLabel) sgModeLabel.textContent = sgModeOn ? 'SG MODE: ON' : 'SG MODE: OFF';
-    flashToast(sgModeOn ? 'SG MODE ACTIVE' : 'STANDARD MODE ACTIVE');
-  });
-}
-
 function buildSinglishPrompt(text) {
   const clean = text.trim();
-  return `Rewrite the following message into natural Singaporean Singlish.
+  if (sgModeOn) {
+    return `Rewrite the following message into natural Singaporean Singlish.
 Keep the meaning intact.
 Make it sound local, clear, and human.
+Allow light local flavour and natural Singapore rhythm.
 Do not overdo slang or particles.
 Do not turn every line into just "lah".
+
+Text:
+"${clean}"`;
+  }
+  return `Rewrite the following message into light Singapore-aware English.
+Keep the meaning intact.
+Keep it clear, neutral, and easy to understand.
+Use only a very light touch of local flavour if needed.
+Avoid heavy slang, particles, or exaggerated Singlish.
 
 Text:
 "${clean}"`;
@@ -607,9 +611,22 @@ Text:
 
 function buildChatGPTPrompt(text) {
   const clean = text.trim();
+  if (sgModeOn) {
+    return `Improve the following prompt for ChatGPT.
+Make it clearer, more specific, and easier for ChatGPT to answer well.
+Preserve the user's original intent.
+Keep the wording concise and practical.
+If local context matters, retain a Singapore-aware framing.
+Do not overcomplicate it.
+Return only the improved prompt.
+
+Prompt:
+"${clean}"`;
+  }
   return `Improve the following prompt for ChatGPT.
 Make it clearer, more specific, and easier for ChatGPT to answer well.
 Preserve the user's original intent.
+Keep the wording concise, neutral, and broadly usable.
 Do not overcomplicate it.
 Return only the improved prompt.
 
@@ -645,6 +662,18 @@ function getPreferredPrompt() {
   if (lastModeUsed === 'singlish') return singlish;
   if (lastModeUsed === 'standard') return chatgpt;
   return chatgpt || singlish;
+}
+
+if (sgModeBtn) {
+  sgModeBtn.addEventListener('click', () => {
+    sgModeOn = !sgModeOn;
+    if (sgModeLabel) sgModeLabel.textContent = sgModeOn ? 'SG MODE: ON' : 'SG MODE: OFF';
+    flashToast(sgModeOn ? 'LOCAL FLAVOUR ACTIVE' : 'NEUTRAL MODE ACTIVE');
+
+    if (inputText && inputText.value.trim()) {
+      updateOutputs(lastModeUsed === 'singlish' || lastModeUsed === 'standard' ? lastModeUsed : 'both');
+    }
+  });
 }
 
 if (sendBtn) sendBtn.addEventListener('click', () => updateOutputs('both'));
