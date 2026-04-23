@@ -1,37 +1,49 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders()
+  });
+}
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
-  }
-
+export async function POST(request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({
-      error: 'Missing OPENAI_API_KEY in Vercel environment variables.'
-    });
+    return jsonResponse(
+      {
+        error: 'Missing OPENAI_API_KEY in Vercel environment variables.'
+      },
+      500
+    );
   }
 
+  let body = {};
+
   try {
-    const body =
-      typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    body = await request.json();
+  } catch {
+    return jsonResponse(
+      {
+        error: 'Invalid JSON body.'
+      },
+      400
+    );
+  }
 
-    const text = (body.text || '').trim();
-    const mode = body.mode || 'both';
-    const sgModeOn = body.sgModeOn !== false;
+  const text = (body.text || '').trim();
+  const mode = body.mode || 'both';
+  const sgModeOn = body.sgModeOn !== false;
 
-    if (!text) {
-      return res.status(400).json({ error: 'Missing text.' });
-    }
+  if (!text) {
+    return jsonResponse(
+      {
+        error: 'Missing text.'
+      },
+      400
+    );
+  }
 
-    const systemPrompt = `
+  const systemPrompt = `
 You are the hidden reasoning layer of a prompt-improvement and answer-routing system.
 
 Your job is to classify the user's input and return the correct kind of output.
@@ -68,9 +80,9 @@ Return JSON in exactly this shape:
   "singlish": "string",
   "source": "openai"
 }
-    `.trim();
+  `.trim();
 
-    const userPrompt = `
+  const userPrompt = `
 User input:
 ${text}
 
@@ -85,13 +97,14 @@ Important:
 - Do not merely rewrite a direct factual question unless the route is REFORMULATE or PASS.
 - Keep the answer concise but useful.
 - Return JSON only.
-    `.trim();
+  `.trim();
 
+  try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: \`Bearer \${apiKey}\`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
@@ -107,41 +120,54 @@ Important:
     const raw = await openaiRes.text();
 
     if (!openaiRes.ok) {
-      return res.status(openaiRes.status).json({
-        error: 'OpenAI request failed.',
-        details: raw
-      });
+      return jsonResponse(
+        {
+          error: 'OpenAI request failed.',
+          details: raw
+        },
+        openaiRes.status
+      );
     }
 
     let outer;
     try {
       outer = JSON.parse(raw);
     } catch {
-      return res.status(500).json({
-        error: 'Could not parse OpenAI outer response.',
-        details: raw
-      });
+      return jsonResponse(
+        {
+          error: 'Could not parse OpenAI outer response.',
+          details: raw
+        },
+        500
+      );
     }
 
     const content = outer?.choices?.[0]?.message?.content;
+
     if (!content) {
-      return res.status(500).json({
-        error: 'OpenAI returned no message content.',
-        details: outer
-      });
+      return jsonResponse(
+        {
+          error: 'OpenAI returned no message content.',
+          details: outer
+        },
+        500
+      );
     }
 
     let parsed;
     try {
       parsed = JSON.parse(content);
     } catch {
-      return res.status(500).json({
-        error: 'Model did not return valid JSON.',
-        details: content
-      });
+      return jsonResponse(
+        {
+          error: 'Model did not return valid JSON.',
+          details: content
+        },
+        500
+      );
     }
 
-    return res.status(200).json({
+    return jsonResponse({
       route: {
         mode: parsed?.route?.mode || 'PASS',
         reason: parsed?.route?.reason || 'No reason returned.'
@@ -151,9 +177,30 @@ Important:
       source: parsed?.source || 'openai'
     });
   } catch (err) {
-    return res.status(500).json({
-      error: 'Server error.',
-      details: err instanceof Error ? err.message : String(err)
-    });
+    return jsonResponse(
+      {
+        error: 'Server error.',
+        details: err instanceof Error ? err.message : String(err)
+      },
+      500
+    );
   }
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  };
+}
+
+function jsonResponse(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders()
+    }
+  });
 }
