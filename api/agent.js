@@ -31,38 +31,61 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing text.' });
     }
 
-    const systemPrompt = `You are the hidden reasoning layer of a prompt-improvement and answer-routing system.
+    const systemPrompt = `
+You are the hidden reasoning layer of a prompt-improvement and answer-routing system.
 
-Your job is to help rewrite user input cleanly and usefully.
+Your job is to classify the user's input and return the correct kind of output.
 
-Modes:
-- singlish: rewrite with light natural Singapore flavour
-- standard: rewrite into clear standard English
-- both: return both versions
+Route modes:
+- ANSWER = the user asked a direct question with enough context
+- REFORMULATE = the user wrote a rough prompt or unclear wording that should be improved
+- ASK = critical context is missing
+- PASS = already usable with minimal change
 
-Rules:
-1. Preserve the user's intent.
-2. Keep the output concise, practical, and readable.
-3. Do not add explanations unless explicitly asked.
-4. Break long outputs into proper paragraphs.
-5. For Singlish, keep it natural and light, not exaggerated.
-6. For standard English, make it clearer for ChatGPT or normal use.
-7. Return JSON only.`;
+Output rules:
+1. Always preserve user intent.
+2. If the route is ANSWER:
+   - "standard" must be the actual answer in clear standard English.
+   - "singlish" must be the same answer in light natural Singlish if possible.
+3. If the route is REFORMULATE or PASS:
+   - "standard" must be a cleaner standard-English prompt or phrasing.
+   - "singlish" must be a natural Singlish rewrite.
+4. If the route is ASK:
+   - "standard" must be a short clarifying question.
+   - "singlish" must be the same clarifying question in light natural Singlish.
+5. For Singlish, keep it light, readable, and human. Do not overdo particles.
+6. For standard English, use short readable paragraphs.
+7. Do not include explanations outside the JSON.
+8. Return valid JSON only.
 
-    const userPrompt = `Rewrite this input.
+Return JSON in exactly this shape:
+{
+  "route": {
+    "mode": "ANSWER" | "REFORMULATE" | "ASK" | "PASS",
+    "reason": "short explanation"
+  },
+  "standard": "string",
+  "singlish": "string",
+  "source": "openai"
+}
+`.trim();
 
-Input:
+    const userPrompt = `
+User input:
 ${text}
 
-Requested mode: ${mode}
-Singapore mode enabled: ${sgModeOn ? 'yes' : 'no'}
+Interface mode requested:
+${mode}
 
-Return JSON in this exact shape:
-{
-  "standard": "....",
-  "singlish": "....",
-  "detectedMode": "standard|singlish|both"
-}`;
+Singapore mode enabled:
+${sgModeOn ? 'yes' : 'no'}
+
+Important:
+- If the user is asking for factual information, answer it directly.
+- Do not merely rewrite a direct factual question unless the route is REFORMULATE or PASS.
+- Keep the answer concise but useful.
+- Return JSON only.
+`.trim();
 
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -72,7 +95,7 @@ Return JSON in this exact shape:
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        temperature: 0.7,
+        temperature: 0.4,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
@@ -89,9 +112,9 @@ Return JSON in this exact shape:
       });
     }
 
-    let parsedOuter;
+    let outer;
     try {
-      parsedOuter = JSON.parse(raw);
+      outer = JSON.parse(raw);
     } catch {
       return res.status(500).json({
         error: 'Could not parse OpenAI outer response.',
@@ -99,30 +122,32 @@ Return JSON in this exact shape:
       });
     }
 
-    const content = parsedOuter?.choices?.[0]?.message?.content;
-
+    const content = outer?.choices?.[0]?.message?.content;
     if (!content) {
       return res.status(500).json({
         error: 'OpenAI returned no message content.',
-        details: parsedOuter
+        details: outer
       });
     }
 
-    let parsedInner;
+    let parsed;
     try {
-      parsedInner = JSON.parse(content);
+      parsed = JSON.parse(content);
     } catch {
-      parsedInner = {
-        standard: mode === 'singlish' ? '' : content,
-        singlish: mode === 'standard' ? '' : content,
-        detectedMode: mode
-      };
+      return res.status(500).json({
+        error: 'Model did not return valid JSON.',
+        details: content
+      });
     }
 
     return res.status(200).json({
-      standard: parsedInner.standard || '',
-      singlish: parsedInner.singlish || '',
-      detectedMode: parsedInner.detectedMode || mode
+      route: {
+        mode: parsed?.route?.mode || 'PASS',
+        reason: parsed?.route?.reason || 'No reason returned.'
+      },
+      standard: parsed?.standard || '',
+      singlish: parsed?.singlish || '',
+      source: parsed?.source || 'openai'
     });
   } catch (err) {
     return res.status(500).json({
