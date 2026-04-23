@@ -73,45 +73,54 @@ body{
 .scrollbtn{border-bottom:2px solid var(--line); display:grid; place-items:center; font-size:13px;}
 .scrolltrack{border-bottom:2px solid var(--line); position:relative;}
 .scrollthumb{position:absolute; inset:10px 4px auto 4px; height:44px; border:2px solid var(--line); background:#f4f4f8;}
-.mode-row{max-width:780px; margin:20px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:22px;}
-.mode-card{
-  padding:18px 20px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:14px;
-  min-height:92px;
+.mode-row{
+  max-width:780px;
+  margin:20px auto 16px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
 }
+.mode-card{
+  padding:18px 22px;
+  display:grid;
+  grid-template-columns:72px 1fr;
+  align-items:center;
+  column-gap:16px;
+  min-height:108px;
+}
+.mode-card.pink{background:var(--pink); border:2px solid var(--pink-border);}
+.mode-card.blue{background:var(--blue); border:2px solid var(--blue-border);}
 .mode-icon{
-  flex:0 0 72px;
   width:72px;
   height:72px;
   display:flex;
   align-items:center;
   justify-content:center;
-  align-self:center;
 }
 .mode-copy{
-  flex:1;
-  min-height:58px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   text-align:center;
-  gap:8px;
 }
 .mode-title{
   font-size:13px;
-  line-height:1.45;
-  margin-bottom:0;
+  line-height:1.5;
+  margin:0;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 .mode-sub{
+  margin-top:10px;
   font-size:18px;
-  line-height:1.15;
+  line-height:1.1;
   color:#202027;
-  max-width:250px;
   text-align:center;
+  width:100%;
 }
 
 .input-window{max-width:980px; margin:18px auto 0; border:2px solid var(--line); box-shadow:inset 1px 1px 0 #fff, inset -1px -1px 0 #bcbcC7;}
@@ -282,7 +291,7 @@ body{
       </svg>
     </div>
     <div class="mode-copy">
-      <div class="mode-title pixel">REWRITE TO SINGLISH</div>
+      <div class="mode-title pixel">REWRITE TO<br>SINGLISH</div>
       <div class="mode-sub pixelish">Improve this prompt</div>
     </div>
   </button>
@@ -295,7 +304,7 @@ body{
       </svg>
     </div>
     <div class="mode-copy">
-      <div class="mode-title pixel">REWRITE TO CHATGPT PROMPT</div>
+      <div class="mode-title pixel">REWRITE TO CHATGPT<br>PROMPT</div>
       <div class="mode-sub pixelish">Make it clearer for ChatGPT</div>
     </div>
   </button>
