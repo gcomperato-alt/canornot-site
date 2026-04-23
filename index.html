@@ -74,12 +74,45 @@ body{
 .scrolltrack{border-bottom:2px solid var(--line); position:relative;}
 .scrollthumb{position:absolute; inset:10px 4px auto 4px; height:44px; border:2px solid var(--line); background:#f4f4f8;}
 .mode-row{max-width:780px; margin:20px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:22px;}
-.mode-card{padding:18px 20px 16px; display:flex; align-items:center; gap:14px; min-height:92px;}
-.mode-card.pink{background:var(--pink); border:2px solid var(--pink-border);}
-.mode-card.blue{background:var(--blue); border:2px solid var(--blue-border);}
-.mode-icon{flex:0 0 72px; width:72px; display:grid; place-items:center;}
-.mode-title{font-size:13px; line-height:1.55; margin-bottom:8px;}
-.mode-sub{font-size:18px; line-height:1.22; color:#202027; max-width:250px;}
+.mode-card{
+  padding:18px 20px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  min-height:92px;
+}
+.mode-icon{
+  flex:0 0 72px;
+  width:72px;
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  align-self:center;
+}
+.mode-copy{
+  flex:1;
+  min-height:58px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:8px;
+}
+.mode-title{
+  font-size:13px;
+  line-height:1.45;
+  margin-bottom:0;
+}
+.mode-sub{
+  font-size:18px;
+  line-height:1.15;
+  color:#202027;
+  max-width:250px;
+  text-align:center;
+}
 
 .input-window{max-width:980px; margin:18px auto 0; border:2px solid var(--line); box-shadow:inset 1px 1px 0 #fff, inset -1px -1px 0 #bcbcC7;}
 .winbar{height:30px; padding:0 10px; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3)); color:var(--yellow); font-size:10px; border-bottom:2px solid var(--line);}
@@ -243,7 +276,7 @@ body{
 <div class="mode-row">
   <button id="singlishBtn" class="mode-card pink btn" type="button">
     <div class="mode-icon">
-      <svg width="68" height="68" viewBox="0 0 68 68" aria-hidden="true">
+      <svg width="64" height="64" viewBox="0 0 68 68" aria-hidden="true">
         <circle cx="34" cy="34" r="25" fill="#ef5d84" stroke="#222" stroke-width="2.5"></circle>
         <text x="34" y="39" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#ffffff">lah</text>
       </svg>
