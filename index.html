@@ -220,7 +220,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .quote{font-size:58px; line-height:1; margin:16px 0 6px;}
 .quote.pink{color:#df6690;}
 .quote.blue{color:#6986df;}
-.output-text{font-size:24px; line-height:1.12; color:#24242b; white-space:pre-wrap; min-height:106px;}
+.output-text{font-size:24px; line-height:1.38; color:#24242b; white-space:pre-wrap; min-height:106px; word-break:break-word; overflow-wrap:anywhere;}
 .meta{margin-top:18px; padding:16px 18px; border:2px solid; font-size:18px; line-height:1.2; font-family:'VT323', monospace;}
 .meta.pink{background:#f6dde4; border-color:#ed98b2;}
 .meta.blue{background:#dee6f7; border-color:#99b1ef;}
@@ -512,7 +512,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <h1 class="pixel">
 <span>You write.</span>
 <span class="red">AI</span>
-<span>optimizes input.</span><br/>
+<span>reformulates.</span><br/>
 <span class="red">Singlish</span>
 <span>or Standard English.</span>
 </h1>
@@ -570,11 +570,11 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </div>
 <section class="output">
 <div class="output-head pixel">
-<div>★ HERE'S YOUR REFORMULATED OUTPUT</div>
+<div>★ YOUR INPUT, REFINED</div>
 <button class="btn copybtn pixel" id="copyBothBtn" type="button"><svg height="15" viewbox="0 0 15 15" width="15"><rect fill="#fff" height="9" stroke="#222" stroke-width="1.5" width="9" x="4" y="4"></rect><rect fill="#ececf3" height="9" stroke="#222" stroke-width="1.5" width="9" x="1" y="1"></rect></svg><span>COPY BOTH</span></button>
 <button class="btn pixel copybtn" id="openChatgptBtn" type="button"><span>COPY &amp; OPEN CHATGPT</span></button>
 </div>
-<div class="prompt-hint terminal">💡 Paste this into ChatGPT to get your result. <a href="https://chatgpt.com/" rel="noopener noreferrer" target="_blank">Open ChatGPT homepage</a></div>
+<div class="prompt-hint terminal">💡 Copy the clean version below and paste it into ChatGPT. <a href="https://chatgpt.com/" rel="noopener noreferrer" target="_blank">Open ChatGPT homepage</a></div>
 <div class="output-grid">
 <div class="col">
 <div class="label pink pixel">SINGLISH</div>
@@ -585,7 +585,7 @@ Thanks ah!</div>
 <div class="meta pink"><div><strong>TONE:</strong> Local, natural, human</div><div style="margin-top:8px;"><strong>GOOD FOR:</strong> Local rewrites, Singlish phrasing</div></div>
 </div>
 <div class="col">
-<div class="label blue pixel">CHATGPT PROMPT</div>
+<div class="label blue pixel">YOUR INPUT, REFINED</div>
 <div class="quote blue pixel">“</div>
 <div class="output-text terminal" id="standardOutput">I will be slightly delayed.
 Would it be possible to reschedule our meeting to 3pm?
@@ -626,6 +626,9 @@ Thank you.</div>
   white-space:pre-wrap;
   font-family:'VT323', monospace;
   font-size:22px;
+  line-height:1.45;
+  word-break:break-word;
+  overflow-wrap:anywhere;
 ">
   Returned answer will appear here...
 </div>
@@ -736,12 +739,14 @@ function buildChatGPTPrompt(text) {
 
   if (!clean) return '';
 
-  return `${MASTER_AI_ROUTER}
+  return `Improve or answer the following user input for ChatGPT.
 
-Analyze the user input and decide the best mode.
-If mode is REFORMULATE or PASS, improve the prompt for AI use.
-If mode is ANSWER, answer directly.
-If mode is ASK, ask only the minimum needed clarifying question.
+Keep the original intent.
+Use clear natural English.
+Write in short, readable paragraphs instead of one dense block of text.
+Do not overcomplicate the wording.
+If local context matters, preserve a Singapore-aware framing.
+Return only the final improved prompt or answer.
 
 User input:
 "${clean}"`;
