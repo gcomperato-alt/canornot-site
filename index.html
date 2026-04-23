@@ -364,6 +364,34 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 }
 
 
+
+.processing .textarea-wrap{
+  animation:inputScan 0.55s ease;
+}
+.processing .hero-skyline img,
+.processing .footer-merlion{
+  animation:agentPulse 0.7s ease;
+}
+.output-appear{
+  animation:outputAppear 0.45s ease;
+}
+@keyframes inputScan{
+  0%{transform:translateX(0) scale(1);opacity:1;filter:none;}
+  35%{transform:translateX(6px) scale(0.985);opacity:0.88;filter:brightness(1.08);}
+  70%{transform:translateX(-3px) scale(0.992);opacity:0.94;filter:brightness(1.02);}
+  100%{transform:translateX(0) scale(1);opacity:1;filter:none;}
+}
+@keyframes agentPulse{
+  0%{transform:scale(1) translateY(0);filter:brightness(1);}
+  35%{transform:scale(1.06) translateY(-3px);filter:brightness(1.12);}
+  65%{transform:scale(0.98) translateY(1px);filter:brightness(0.98);}
+  100%{transform:scale(1) translateY(0);filter:brightness(1);}
+}
+@keyframes outputAppear{
+  0%{opacity:0;transform:translateY(8px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -592,6 +620,7 @@ Thank you.</div>
 
 
 
+
 <script>
 const inputText = document.getElementById('inputText');
 const singlishOutput = document.getElementById('singlishOutput');
@@ -620,6 +649,23 @@ function setMode(mode) {
   lastModeUsed = mode;
   if (singlishBtn) singlishBtn.classList.toggle('active', mode === 'singlish');
   if (standardBtn) standardBtn.classList.toggle('active', mode === 'standard');
+}
+
+function startProcessingAnimation() {
+  document.body.classList.add('processing');
+}
+
+function stopProcessingAnimation() {
+  document.body.classList.remove('processing');
+}
+
+function animateOutputs() {
+  [singlishOutput, standardOutput].forEach(el => {
+    if (!el) return;
+    el.classList.remove('output-appear');
+    void el.offsetWidth;
+    el.classList.add('output-appear');
+  });
 }
 
 function buildSinglishPrompt(text) {
@@ -679,17 +725,24 @@ function updateOutputs(mode = 'both') {
     return;
   }
 
-  if (mode === 'singlish') {
-    singlishOutput.textContent = buildSinglishPrompt(text);
-    setMode('singlish');
-  } else if (mode === 'standard') {
-    standardOutput.textContent = buildChatGPTPrompt(text);
-    setMode('standard');
-  } else {
-    singlishOutput.textContent = buildSinglishPrompt(text);
-    standardOutput.textContent = buildChatGPTPrompt(text);
-    setMode('both');
-  }
+  startProcessingAnimation();
+
+  setTimeout(() => {
+    if (mode === 'singlish') {
+      singlishOutput.textContent = buildSinglishPrompt(text);
+      setMode('singlish');
+    } else if (mode === 'standard') {
+      standardOutput.textContent = buildChatGPTPrompt(text);
+      setMode('standard');
+    } else {
+      singlishOutput.textContent = buildSinglishPrompt(text);
+      standardOutput.textContent = buildChatGPTPrompt(text);
+      setMode('both');
+    }
+
+    animateOutputs();
+    stopProcessingAnimation();
+  }, 420);
 }
 
 function getPreferredPrompt() {
@@ -712,13 +765,33 @@ if (sgModeBtn) {
   });
 }
 
-if (sendBtn) sendBtn.addEventListener('click', () => updateOutputs('both'));
-if (singlishBtn) singlishBtn.addEventListener('click', () => updateOutputs('singlish'));
-if (standardBtn) standardBtn.addEventListener('click', () => updateOutputs('standard'));
+if (sendBtn) {
+  sendBtn.addEventListener('click', () => {
+    flashToast('PROCESSING...');
+    updateOutputs('both');
+  });
+}
+
+if (singlishBtn) {
+  singlishBtn.addEventListener('click', () => {
+    flashToast('REFINING LOCAL TONE...');
+    updateOutputs('singlish');
+  });
+}
+
+if (standardBtn) {
+  standardBtn.addEventListener('click', () => {
+    flashToast('CLEARING PROMPT...');
+    updateOutputs('standard');
+  });
+}
 
 if (inputText) {
   inputText.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) updateOutputs('both');
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      flashToast('PROCESSING...');
+      updateOutputs('both');
+    }
   });
 }
 
