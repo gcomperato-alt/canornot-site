@@ -412,6 +412,75 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 }
 
 
+
+
+.crab-helper{
+  max-width:980px;
+  margin:18px auto 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 16px;
+  border:2px solid var(--line);
+  background:#fffaf0;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c3c2cc;
+}
+
+.crab-helper.crab-visible{
+  animation:crabSlideIn 0.45s ease;
+}
+
+.crab-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.crab-helper img{
+  width:78px;
+  height:auto;
+  border-radius:14px;
+  border:2px solid var(--line);
+  background:#111;
+}
+
+.crab-text{
+  font-family:'VT323', monospace;
+  color:#25252d;
+}
+
+.crab-title{
+  font-size:25px;
+  line-height:1.05;
+}
+
+.crab-sub{
+  margin-top:4px;
+  font-size:20px;
+  line-height:1.12;
+  color:#33333a;
+}
+
+.crab-arrow{
+  flex:0 0 auto;
+  font-size:38px;
+  line-height:1;
+  color:#dc2f2f;
+  animation:pointDown 1.1s ease-in-out infinite;
+}
+
+@keyframes pointDown{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(7px);}
+  100%{transform:translateY(0);}
+}
+
+@keyframes crabSlideIn{
+  0%{opacity:0; transform:translateY(10px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+
 .cothink-link{
   text-decoration:none;
   color:#181818;
@@ -519,6 +588,24 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
     flex-direction:column;
     align-items:flex-start;
   }
+
+  .crab-helper{
+    align-items:flex-start;
+  }
+
+  .crab-left{
+    align-items:flex-start;
+  }
+
+  .crab-helper img{
+    width:64px;
+  }
+
+  .crab-arrow{
+    font-size:32px;
+    align-self:center;
+  }
+
 }
 </style>
 </head>
@@ -672,6 +759,18 @@ Thank you.</div>
 </div>
 </div>
 </section>
+
+<section class="crab-helper hidden" id="crabHelper">
+  <div class="crab-left">
+    <img src="cothink-logo.png" alt="CoThink crab thinking partner" />
+    <div class="crab-text">
+      <div class="crab-title">🦀 Want a better answer?</div>
+      <div class="crab-sub">Scroll down. I’ll help you optimize your input for AI.</div>
+    </div>
+  </div>
+  <div class="crab-arrow" aria-hidden="true">↓</div>
+</section>
+
 <section class="cothink-card">
   <div class="cothink-copy">
     <strong>NEW TOOL</strong><br/>
@@ -742,6 +841,7 @@ const openChatgptBtn = document.getElementById('openChatgptBtn');
 const sgModeBtn = document.getElementById('sgModeBtn');
 const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
+const crabHelper = document.getElementById('crabHelper');
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -1024,6 +1124,7 @@ async function updateOutputs(mode = 'both') {
   const text = inputText?.value.trim() || '';
 
   if (!text) {
+    if (crabHelper) crabHelper.classList.add('hidden');
     if (singlishOutput) singlishOutput.textContent = 'Type something first.';
     if (standardOutput) standardOutput.textContent = 'Please enter your text above.';
     stopProcessingAnimation();
@@ -1081,6 +1182,11 @@ async function updateOutputs(mode = 'both') {
       }
 
       returnedAnswer.textContent = parts.join('\n');
+    }
+
+    if (crabHelper) {
+      crabHelper.classList.remove('hidden');
+      crabHelper.classList.add('crab-visible');
     }
   } catch (err) {
     flashToast('ERROR: ' + String(err.message || err).slice(0, 44));
