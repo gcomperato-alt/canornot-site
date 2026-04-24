@@ -6,6 +6,24 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Can or Not - AI for Locals</title>
+<meta name="description" content="Can or Not is a playful Singapore-style AI tool that turns everyday input into Singlish and clearer AI-ready prompts."/>
+<meta name="keywords" content="Can or Not, Singlish AI, Singapore AI tool, AI for locals, prompt optimizer, CoThink"/>
+<meta name="author" content="Giuliano Comperato"/>
+<meta property="og:title" content="Can or Not - AI for Locals"/>
+<meta property="og:description" content="Try a fun Singapore-style AI tool for Singlish, clearer prompts, and local-flavour AI output."/>
+<meta property="og:url" content="https://www.canornot.co"/>
+<meta property="og:type" content="website"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Can or Not",
+  "url": "https://www.canornot.co",
+  "description": "A playful Singapore-style AI tool for Singlish, local expression, and clearer AI-ready prompts.",
+  "applicationCategory": "AIApplication",
+  "operatingSystem": "Web"
+}
+</script>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323&amp;display=swap" rel="stylesheet"/>
@@ -207,7 +225,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .mode-title{font-size:13px; line-height:1.55; margin-bottom:8px;}
 .mode-sub{font-size:18px; line-height:1.22; color:#202027; max-width:250px;}
 
-.output{max-width:1320px; margin:16px auto 0; border:2px solid var(--line); background:#f6f5f9; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c5c3cd;}
+.output{max-width:1320px; margin:10px auto 0; border:2px solid var(--line); background:#f6f5f9; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c5c3cd;}
 .output-head{height:32px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; background:linear-gradient(90deg,var(--purple1),var(--purple2) 58%,var(--purple3)); border-bottom:2px solid var(--line); color:var(--yellow); font-size:10px;}
 .copybtn{display:flex; align-items:center; gap:7px; padding:5px 10px; font-size:10px;}
 .prompt-hint{padding:10px 14px; border-bottom:2px solid #c7c6cf; font-size:18px; line-height:1.15; color:#2b2b33; background:#f2f1f6;}
@@ -393,6 +411,68 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   100%{opacity:1;transform:translateY(0);}
 }
 
+
+.cothink-link{
+  text-decoration:none;
+  color:#181818;
+}
+
+.cothink-card{
+  max-width:980px;
+  margin:22px auto 0;
+  padding:16px 18px;
+  border:2px solid var(--line);
+  background:#fff7df;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c3c2cc;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.cothink-copy{
+  font-size:22px;
+  line-height:1.15;
+  font-family:'VT323', monospace;
+}
+
+.cothink-copy strong{
+  font-family:'Press Start 2P', monospace;
+  font-size:11px;
+}
+
+.cothink-btn{
+  white-space:nowrap;
+  padding:10px 14px;
+  font-size:10px;
+}
+
+.qr-card{
+  max-width:980px;
+  margin:14px auto 0;
+  padding:14px 18px;
+  border:2px solid var(--line);
+  background:#f6f5f9;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.qr-card img{
+  width:110px;
+  height:110px;
+  border:2px solid var(--line);
+  background:white;
+  padding:6px;
+}
+
+.qr-copy{
+  font-family:'VT323', monospace;
+  font-size:22px;
+  line-height:1.15;
+}
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -433,6 +513,12 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .footer-grid{grid-template-columns:1fr;}
   .footer-item{border-right:0; border-bottom:2px solid #c7c6cf;}
   .footer-item:last-child{padding-right:180px; border-bottom:0;}
+
+  .cothink-card,
+  .qr-card{
+    flex-direction:column;
+    align-items:flex-start;
+  }
 }
 </style>
 </head>
@@ -542,32 +628,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </div>
 </div>
 </section>
-<div class="mode-row">
-<button class="mode-card pink btn" id="singlishBtn" type="button">
-<div class="mode-icon">
-<svg aria-hidden="true" height="64" viewbox="0 0 68 68" width="64">
-<circle cx="34" cy="34" fill="#ef5d84" r="25" stroke="#222" stroke-width="2.5"></circle>
-<text fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" text-anchor="middle" x="34" y="39">lah</text>
-</svg>
-</div>
-<div class="mode-copy">
-<div class="mode-title pixel">REWRITE TO<br/>SINGLISH</div>
-<div class="mode-sub">Rewrite with local flavour</div>
-</div>
-</button>
-<button class="mode-card blue btn" id="standardBtn" type="button">
-<div class="mode-icon">
-<svg aria-hidden="true" height="62" viewbox="0 0 62 62" width="62">
-<circle cx="31" cy="31" fill="#7f9cff" r="17" stroke="#222" stroke-width="2.2"></circle>
-<path d="M14 31h34M31 14c6 5 9 11 9 17s-3 12-9 17M31 14c-6 5-9 11-9 17s3 12 9 17M19 21c3 2 8 3 12 3s9-1 12-3M19 41c3-2 8-3 12-3s9 1 12 3" fill="none" stroke="#222" stroke-linecap="square" stroke-width="2"></path>
-</svg>
-</div>
-<div class="mode-copy">
-<div class="mode-title pixel">ANSWER OR CLEAR<br/>ENGLISH</div>
-<div class="mode-sub">Answer directly or clarify it</div>
-</div>
-</button>
-</div>
+
+
 <section class="output">
 <div class="output-head pixel">
 <div>★ ANSWER OR CLEAR VERSION</div>
@@ -610,6 +672,29 @@ Thank you.</div>
 </div>
 </div>
 </section>
+<section class="cothink-card">
+  <div class="cothink-copy">
+    <strong>NEW TOOL</strong><br/>
+    Need a clearer AI prompt? Try CoThink before asking ChatGPT.
+  </div>
+
+  <a class="btn pixel cothink-btn cothink-link" href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">
+    OPEN COTHINK →
+  </a>
+</section>
+
+<section class="qr-card">
+  <div class="qr-copy">
+    Share Can or Not quickly.<br/>
+    Scan this QR code and open the site on your phone.
+  </div>
+
+  <img
+    alt="QR code for Can or Not"
+    src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=https%3A%2F%2Fwww.canornot.co"
+  />
+</section>
+
 <footer class="footer">
 <div class="footer-grid">
 <div class="footer-item"><div class="footer-head pixel"><span style="font-size:18px">🔒</span><span>PRIVACY FIRST</span></div><div class="footer-copy terminal">Your input is not stored</div></div>
