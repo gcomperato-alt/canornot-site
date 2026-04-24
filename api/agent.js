@@ -33,6 +33,19 @@ export async function POST(request) {
   const text = (body.text || '').trim();
   const mode = body.mode || 'both';
   const sgModeOn = body.sgModeOn !== false;
+  const ownerMode = body.ownerMode === true;
+
+  if (ownerMode) {
+    return jsonResponse({
+      route: {
+        mode: 'PASS',
+        reason: 'Owner test mode.'
+      },
+      singlish: 'Owner test mode lah. No OpenAI API call made.',
+      standard: 'Owner test mode. No OpenAI API call was made.',
+      source: 'owner'
+    });
+  }
 
   if (!text) {
     return jsonResponse(
