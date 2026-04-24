@@ -1,6 +1,6 @@
 
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -658,6 +658,19 @@ const sgModeBtn = document.getElementById('sgModeBtn');
 const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
 
+const urlParams = new URLSearchParams(window.location.search);
+
+if (urlParams.get("owner") === "true") {
+  localStorage.setItem("canOrNotOwner", "true");
+}
+
+const isOwner = localStorage.getItem("canOrNotOwner") === "true";
+
+if (isOwner) {
+  console.log("Can or Not owner mode active: API calls and analytics are skipped on this browser.");
+}
+
+
 let sgModeOn = true;
 let lastModeUsed = 'both';
 let lastSinglishPrompt = '';
@@ -874,10 +887,22 @@ function setOutput(el, value) {
 }
 
 async function callAgent(text, mode) {
+  if (isOwner) {
+    return {
+      source: 'owner-test',
+      route: {
+        mode: 'OWNER',
+        reason: 'Owner test mode is active, so no OpenAI API call was made.'
+      },
+      singlish: 'Owner test mode lah. No OpenAI API call made.',
+      standard: 'Owner test mode. No OpenAI API call was made.'
+    };
+  }
+
   const response = await fetch(API_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, mode, sgModeOn })
+    body: JSON.stringify({ text, mode, sgModeOn, ownerMode: isOwner })
   });
 
   const contentType = response.headers.get('content-type') || '';
@@ -1159,6 +1184,16 @@ setMode('both');
     </div>
   </div>
 </div>
-<script defer src="/_vercel/insights/script.js"></script>
+<script>
+(function () {
+  const isOwner = localStorage.getItem("canOrNotOwner") === "true";
+  if (isOwner) return;
+
+  const script = document.createElement("script");
+  script.defer = true;
+  script.src = "/_vercel/insights/script.js";
+  document.head.appendChild(script);
+})();
+</script>
 </body>
 </html>
