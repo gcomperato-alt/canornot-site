@@ -1487,13 +1487,28 @@ function renderStaleRisk(text, reason) {
 }
 
 function detectCrabCategory(text) {
-  const clean = (text || '').trim();
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return 'empty';
+
   const lower = clean.toLowerCase();
-  if (detectOutdatedRisk(clean)) return 'stale';
+
+  // Clear direct questions should feel observed, not dismissed as "meh".
+  // This catches natural questions even without a question mark:
+  // "where is Marina Bay Sands", "what is...", "how to...", etc.
+  const isDirectQuestion =
+    /[?？]$/.test(clean) ||
+    /^(what|why|how|when|where|who|which|whose|is|are|am|was|were|can|could|should|would|do|does|did|will|shall|may|might)/i.test(clean) ||
+    /(where is|where are|what is|who is|how do|how to|can i|can we|should i)/i.test(lower);
+
+  // Stale detector remains, but only after we know it is not a normal static location question.
+  // "Where is Marina Bay Sands" should route as a question, not as a stale/current-facts warning.
+  const staleRisk = detectOutdatedRisk(clean);
+  const looksStaticWhereQuestion = /^where\s+(is|are)/i.test(clean) && !/(now|current|currently|latest|today|tonight|tomorrow|open|closed|price|cost|weather|news|schedule|hours?)/i.test(lower);
+  if (staleRisk && !looksStaticWhereQuestion) return 'stale';
+
   if (/(singlish|lah|leh|lor|sia|can or not|cannot|wah|aiyo)/i.test(clean)) return 'singlish';
-  if (/(prompt|chatgpt|ai|rewrite|improve|clean|make.*better|refine|cothink)/i.test(lower)) return 'prompt';
-  if (/[?？]$/.test(clean) || /^(what|why|how|when|where|who|is|are|can|could|should|would|do|does|did)/i.test(clean)) return 'question';
+  if (/(prompt|chatgpt|ai|rewrite|improve|clean|make\s+.*better|refine|cothink)/i.test(lower)) return 'prompt';
+  if (isDirectQuestion) return 'question';
   if (clean.length > 150 || clean.split(/\s+/).length > 24) return 'messy';
   return 'idle';
 }
