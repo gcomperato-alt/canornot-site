@@ -135,7 +135,38 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .hero-copy{text-align:center; padding-top:0; width:100%;}
 .hero-copy h1{margin:0; font-size:34px; line-height:1.72; font-weight:normal;}
 .hero-copy .red{color:var(--red);}
-.hero-sub{margin-top:8px; color:var(--muted); font-size:16px;}
+.hero-sub{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.cothink-crab-btn{
+  width:28px;
+  height:28px;
+  display:inline-grid;
+  place-items:center;
+  border:2px solid var(--line);
+  background:#fff7df;
+  color:#111;
+  text-decoration:none;
+  box-shadow:2px 2px 0 rgba(0,0,0,.18);
+  line-height:1;
+  font-size:15px;
+  transform:translateY(-1px);
+}
+.cothink-crab-btn:hover{
+  background:var(--yellow);
+  transform:translateY(-2px);
+}
+.cothink-crab-btn:active{
+  transform:translate(1px,0);
+  box-shadow:1px 1px 0 rgba(0,0,0,.18);
+}
 
 .crab-hook{
   margin-top:10px;
@@ -836,7 +867,11 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <h1 class="pixel">
 <span>Can AI </span><span class="red">Singlish</span><span> or Not?</span>
 </h1>
-<div class="hero-sub pixel">Try to Unlock CoThink with AI</div>
+<div class="hero-sub pixel">
+  <span>CoThink</span>
+  <a class="cothink-crab-btn" href="https://co-think-sage.vercel.app" target="_blank" rel="noopener" title="Open CoThink with AI">🦀</a>
+  <span>with AI</span>
+</div>
 <div class="crab-hook pixel"><span id="heroTypewriter"></span><span class="cursor">▌</span></div>
 </div>
 </section>
