@@ -588,6 +588,20 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .rating-feedback{display:none;margin-top:12px;padding:12px 14px;border:2px solid var(--line);background:#f6f5f9;font-family:'VT323', monospace;font-size:22px;line-height:1.12;}
 .rating-feedback.open{display:block;}
 .rating-feedback a{color:#2f43c7;text-decoration:underline;}
+.refine-panel{display:none;margin-top:12px;padding:12px 14px;border:2px solid var(--line);background:#f2f1f6;}
+.refine-panel.open{display:block;}
+.refine-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+.refine-copy{font-family:'VT323', monospace;font-size:22px;line-height:1.12;color:#25252b;}
+.refine-metric{display:inline-block;margin-top:8px;padding:6px 10px;border:2px solid var(--line);background:var(--yellow);font-size:10px;color:#111;}
+.refinebtn{padding:9px 12px;font-size:10px;}
+.refine-note{margin-top:10px;font-family:'VT323', monospace;font-size:19px;line-height:1.12;color:#333;}
+.style-memory-panel{margin-top:12px;padding:10px 12px;border:2px dotted #9f9eaa;background:#fffef5;}
+.style-memory-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;}
+.style-pill{display:inline-block;padding:5px 8px;border:2px solid var(--line);background:#fff;color:#111;font-size:9px;}
+.style-pill.level{background:var(--yellow);}
+.style-progress{height:14px;border:2px solid var(--line);background:#e7e6ef;margin-top:8px;max-width:420px;}
+.style-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--pink),var(--blue));transition:width .35s ease;}
+.style-memory-copy{margin-top:8px;font-family:'VT323', monospace;font-size:19px;line-height:1.12;color:#333;}
 
 .cothink-link{
   text-decoration:none;
@@ -844,15 +858,33 @@ Thank you.</div>
 </div>
 
 <div class="rating-panel" id="ratingPanel" style="display:none;">
-  <div class="rating-title pixel">RATE THIS RESULT</div>
-  <div class="rating-copy">Local Crab wants your judgment. Was this useful?</div>
+  <div class="rating-title pixel">RATE ONCE TO UNLOCK REMEMBER MODE</div>
+  <div class="rating-copy">Local Crab wants your judgment. Rate once and I unlock the refine loop.</div>
   <div class="rating-buttons">
     <button class="btn pixel ratebtn" type="button" data-rating="cool">COOL</button>
     <button class="btn pixel ratebtn" type="button" data-rating="average">AVERAGE</button>
     <button class="btn pixel ratebtn" type="button" data-rating="sucks">SUCKS</button>
   </div>
   <div class="rating-feedback" id="ratingFeedback">
-    Thanks. Now let me improve your English and AI input properly: <a href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">open CoThink →</a>
+    Thanks. Remember mode unlocked. Now refine this result or open CoThink: <a href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">open CoThink →</a>
+  </div>
+  <div class="refine-panel" id="refinePanel">
+    <div class="refine-row">
+      <div class="refine-copy">🧬 Remember mode unlocked. One more pass?</div>
+      <button class="btn pixel refinebtn" id="refineBtn" type="button">REFINE ONCE</button>
+    </div>
+    <div class="refine-metric pixel" id="improvementMetric">STYLE IMPROVED +12%</div>
+    <div class="refine-note" id="refineNote">Crab will tighten the wording instantly, no extra API call.</div>
+    <div class="style-memory-panel" id="styleMemoryPanel">
+      <div class="pixel detected-title">STYLE MEMORY</div>
+      <div class="style-memory-row">
+        <span class="style-pill pixel level" id="userLevelPill">LEVEL 1 · BEGINNER</span>
+        <span class="style-pill pixel" id="precisionPill">PRECISION 0%</span>
+        <span class="style-pill pixel" id="visitPill">VISITS 0</span>
+      </div>
+      <div class="style-progress"><div class="style-progress-bar" id="styleProgressBar"></div></div>
+      <div class="style-memory-copy" id="styleMemoryCopy">Rate once to unlock your local style memory.</div>
+    </div>
   </div>
 </div>
 </section>
@@ -949,7 +981,13 @@ const crabTitle = document.querySelector('.crab-title');
 const crabSub = document.querySelector('.crab-sub');
 const crabArrow = document.querySelector('.crab-arrow');
 const STICKY_RESULT_KEY = 'canOrNotStickyResult';
+const REMEMBER_UNLOCK_KEY = 'canOrNotRememberUnlocked';
+const IMPROVEMENT_KEY = 'canOrNotImprovementScore';
+const STYLE_MEMORY_KEY = 'canOrNotStyleMemory';
+const VISIT_COUNT_KEY = 'canOrNotVisitCount';
+const FREQUENT_USER_THRESHOLD = 4;
 let lastCrabLine = '';
+let crabDelayTimer = null;
 
 const CRAB_LINES = {
   idle: [
@@ -1027,6 +1065,31 @@ const CRAB_LINES = {
     ['🦀 Welcome back.', 'I kept your last thought warm. ↓↓'],
     ['🦀 Your previous input still here.', 'Continue from the trail, don’t restart from zero. ↓↓'],
     ['🦀 Memory crumb restored.', 'Last result is below. Pick up from there. ↓↓']
+  ],
+  unlock: [
+    ['🦀 Rating received.', 'Remember mode unlocked. Now refine your input, can. ↓↓'],
+    ['🦀 Good. You fed the crab.', 'Second pass unlocked. Cleaner version incoming if you want. ↓↓'],
+    ['🦀 Judgment accepted.', 'Now I can remember the trail and polish again. ↓↓']
+  ],
+  refine: [
+    ['🦀 Second pass done.', 'I tightened it without calling the server again. ↓↓'],
+    ['🦀 Refined already.', 'Less fluff, more usable. Crab approved. ↓↓'],
+    ['🦀 Cleaner now.', 'Your wording got a small upgrade potion. ↓↓']
+  ],
+  levelup: [
+    ['🦀 Level up lah.', 'Your inputs are getting less swampy. I am almost proud. ↓↓'],
+    ['🦀 New rank unlocked.', 'Sharper wording, fewer fog machines. Not bad. ↓↓'],
+    ['🦀 Style memory grew.', 'I see the pattern now. Dangerous user detected. ↓↓']
+  ],
+  frequent: [
+    ['🦀 You again ah.', 'Good. At least now I know your nonsense format. ↓↓'],
+    ['🦀 Frequent user detected.', 'Crab sarcasm level increased carefully. ↓↓'],
+    ['🦀 Welcome back, regular.', 'Same brain, slightly cleaner trail today? ↓↓']
+  ],
+  sarcastic: [
+    ['🦀 This one again?', 'Never mind. I am trained by suffering, locally. ↓↓'],
+    ['🦀 Wah, ambitious mess.', 'I sharpen, you pretend it was planned. ↓↓'],
+    ['🦀 I see improvement.', 'Small one. Don’t let it go to your head. ↓↓']
   ]
 };
 
@@ -1044,16 +1107,30 @@ function pickCrabLine(category = 'idle') {
   return line;
 }
 
-function updateCrab(category = 'idle') {
-  const [title, sub] = pickCrabLine(category);
-  if (crabTitle) crabTitle.textContent = title;
-  if (crabSub) crabSub.textContent = sub;
-  if (crabArrow) {
-    crabArrow.textContent = '↓↓';
-    crabArrow.style.animation = 'none';
-    void crabArrow.offsetWidth;
-    crabArrow.style.animation = '';
+function updateCrab(category = 'idle', options = {}) {
+  const memory = getStyleMemory();
+  let chosenCategory = category;
+
+  if (!options.force && memory.visits >= FREQUENT_USER_THRESHOLD && ['idle', 'messy', 'returning'].includes(category)) {
+    chosenCategory = Math.random() < 0.46 ? 'frequent' : category;
   }
+  if (!options.force && memory.refines >= 2 && ['messy', 'prompt'].includes(category)) {
+    chosenCategory = Math.random() < 0.28 ? 'sarcastic' : chosenCategory;
+  }
+
+  const [title, sub] = pickCrabLine(chosenCategory);
+  const delay = options.instant ? 0 : 160 + Math.random() * 320;
+  clearTimeout(crabDelayTimer);
+  crabDelayTimer = setTimeout(() => {
+    if (crabTitle) crabTitle.textContent = title;
+    if (crabSub) crabSub.textContent = sub;
+    if (crabArrow) {
+      crabArrow.textContent = '↓↓';
+      crabArrow.style.animation = 'none';
+      void crabArrow.offsetWidth;
+      crabArrow.style.animation = '';
+    }
+  }, delay);
 }
 
 function detectCrabCategory(text) {
@@ -1065,6 +1142,122 @@ function detectCrabCategory(text) {
   if (/[?？]$/.test(clean) || /^(what|why|how|when|where|who|is|are|can|could|should|would|do|does|did)/i.test(clean)) return 'question';
   if (clean.length > 150 || clean.split(/\s+/).length > 24) return 'messy';
   return 'idle';
+}
+
+function clampNumber(value, min, max) {
+  return Math.max(min, Math.min(max, Number(value) || 0));
+}
+
+function getVisitCount() {
+  return clampNumber(localStorage.getItem(VISIT_COUNT_KEY), 0, 9999);
+}
+
+function incrementVisitCount() {
+  const current = getVisitCount();
+  const next = current + 1;
+  localStorage.setItem(VISIT_COUNT_KEY, String(next));
+  return next;
+}
+
+function defaultStyleMemory() {
+  return {
+    precision: 0,
+    submissions: 0,
+    ratings: 0,
+    refines: 0,
+    visits: getVisitCount(),
+    lastLevel: 1,
+    lastInputLength: 0,
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function getStyleMemory() {
+  try {
+    return { ...defaultStyleMemory(), ...(JSON.parse(localStorage.getItem(STYLE_MEMORY_KEY) || '{}') || {}) };
+  } catch {
+    return defaultStyleMemory();
+  }
+}
+
+function saveStyleMemory(memory) {
+  try {
+    memory.lastUpdated = new Date().toISOString();
+    localStorage.setItem(STYLE_MEMORY_KEY, JSON.stringify(memory));
+  } catch {}
+}
+
+function scoreInputPrecision(text) {
+  const clean = (text || '').trim();
+  if (!clean) return 0;
+  const words = clean.split(/s+/).filter(Boolean);
+  let score = 20;
+  if (words.length >= 6) score += 18;
+  if (words.length >= 14) score += 14;
+  if (/[?？]/.test(clean)) score += 10;
+  if (/(please|thanks|thank you|because|so that|context|goal|audience|tone|format)/i.test(clean)) score += 14;
+  if (/[,.;:]/.test(clean)) score += 8;
+  if (/(improve|rewrite|answer|summarize|explain|compare|make|turn)/i.test(clean)) score += 10;
+  if (words.length > 90) score -= 10;
+  if (/(.)\1{5,}/.test(clean)) score -= 8;
+  return clampNumber(score, 5, 98);
+}
+
+function getUserLevel(precision) {
+  if (precision >= 82) return { level: 5, name: 'SHARP THINKER', progress: 100 };
+  if (precision >= 66) return { level: 4, name: 'PROMPT PILOT', progress: 82 };
+  if (precision >= 48) return { level: 3, name: 'CLEARER BRAIN', progress: 62 };
+  if (precision >= 28) return { level: 2, name: 'GETTING STEADY', progress: 38 };
+  return { level: 1, name: 'BEGINNER', progress: 18 };
+}
+
+function updateStyleMemoryFromInput(text, eventType = 'input') {
+  const memory = getStyleMemory();
+  const score = scoreInputPrecision(text);
+  const oldLevel = getUserLevel(memory.precision).level;
+  const weight = eventType === 'submit' ? 0.34 : 0.16;
+  memory.precision = Math.round((memory.precision || 0) * (1 - weight) + score * weight);
+  memory.lastInputLength = (text || '').trim().length;
+  if (eventType === 'submit') memory.submissions += 1;
+  const newLevel = getUserLevel(memory.precision).level;
+  memory.lastLevel = newLevel;
+  saveStyleMemory(memory);
+  renderStyleMemory(memory);
+  if (newLevel > oldLevel && eventType === 'submit') updateCrab('levelup', { force: true });
+  return memory;
+}
+
+function bumpStyleMemory(kind) {
+  const memory = getStyleMemory();
+  if (kind === 'rating') memory.ratings += 1;
+  if (kind === 'refine') memory.refines += 1;
+  if (kind === 'visit') memory.visits = getVisitCount();
+  memory.precision = clampNumber(memory.precision + (kind === 'refine' ? 4 : kind === 'rating' ? 2 : 0), 0, 98);
+  saveStyleMemory(memory);
+  renderStyleMemory(memory);
+  return memory;
+}
+
+function renderStyleMemory(memory = getStyleMemory()) {
+  const level = getUserLevel(memory.precision || 0);
+  const levelPill = document.getElementById('userLevelPill');
+  const precisionPill = document.getElementById('precisionPill');
+  const visitPill = document.getElementById('visitPill');
+  const bar = document.getElementById('styleProgressBar');
+  const copy = document.getElementById('styleMemoryCopy');
+  if (levelPill) levelPill.textContent = `LEVEL ${level.level} · ${level.name}`;
+  if (precisionPill) precisionPill.textContent = `PRECISION ${Math.round(memory.precision || 0)}%`;
+  if (visitPill) visitPill.textContent = `VISITS ${memory.visits || 0}`;
+  if (bar) bar.style.width = `${clampNumber(level.progress, 0, 100)}%`;
+  if (copy) {
+    const frequent = (memory.visits || 0) >= FREQUENT_USER_THRESHOLD;
+    const refined = (memory.refines || 0) > 0;
+    copy.textContent = frequent
+      ? 'Crab knows your return pattern now. Tone: slightly sharper, still useful.'
+      : refined
+        ? 'Style memory is warming up. More ratings and refinements make the loop stickier.'
+        : 'Rate once to unlock your local style memory.';
+  }
 }
 
 function saveStickyResult(snapshot) {
@@ -1110,8 +1303,77 @@ function restoreStickyResult() {
     if (!raw) return;
     const snapshot = JSON.parse(raw);
     renderStickyResult(snapshot);
-    updateCrab('returning');
+    const memory = getStyleMemory();
+    updateCrab(memory.visits >= FREQUENT_USER_THRESHOLD ? 'frequent' : 'returning');
+    if (localStorage.getItem(REMEMBER_UNLOCK_KEY) === 'true') showRefinePanel(false);
+    renderStyleMemory(memory);
   } catch {}
+}
+
+function getImprovementScore() {
+  let score = Number(localStorage.getItem(IMPROVEMENT_KEY));
+  if (!Number.isFinite(score) || score < 7 || score > 19) {
+    score = 8 + Math.floor(Math.random() * 10);
+    localStorage.setItem(IMPROVEMENT_KEY, String(score));
+  }
+  return score;
+}
+
+function showRefinePanel(flash = true) {
+  const panel = document.getElementById('refinePanel');
+  const metric = document.getElementById('improvementMetric');
+  const note = document.getElementById('refineNote');
+  if (metric) metric.textContent = `STYLE IMPROVED +${getImprovementScore()}%`;
+  const memory = getStyleMemory();
+  if (note) note.textContent = `Remember mode is local to this browser. Current level: ${getUserLevel(memory.precision).name}.`;
+  renderStyleMemory(memory);
+  if (panel) panel.classList.add('open');
+  if (flash) updateCrab('unlock');
+}
+
+function tightenText(text) {
+  let out = (text || '').trim();
+  if (!out) return '';
+  out = out
+    .replace(/\bactually\b/gi, '')
+    .replace(/\bbasically\b/gi, '')
+    .replace(/\bvery very\b/gi, 'very')
+    .replace(/\bplease kindly\b/gi, 'please')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.!?])/g, '$1')
+    .trim();
+  if (out.length > 180 && !out.includes('\n')) {
+    const sentences = out.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [out];
+    out = sentences.map(s => s.trim()).filter(Boolean).join('\n\n');
+  }
+  return out;
+}
+
+function refineCurrentResult() {
+  const currentStandard = lastChatgptPrompt || (standardOutput?.textContent || '');
+  const currentSinglish = lastSinglishPrompt || (singlishOutput?.textContent || '');
+  const refinedStandard = tightenText(currentStandard);
+  const refinedSinglish = tightenText(currentSinglish);
+  if (refinedStandard && standardOutput) {
+    lastChatgptPrompt = refinedStandard;
+    setOutput(standardOutput, refinedStandard);
+  }
+  if (refinedSinglish && singlishOutput) {
+    lastSinglishPrompt = refinedSinglish;
+    setOutput(singlishOutput, refinedSinglish);
+  }
+  const snapshot = {
+    input: inputText?.value.trim() || '',
+    mode: 'REFINED',
+    source: 'browser-refine',
+    reason: `Second-pass local refinement. Playful style metric +${getImprovementScore()}%.`,
+    answer: refinedStandard || refinedSinglish
+  };
+  saveStickyResult(snapshot);
+  renderStickyResult(snapshot);
+  bumpStyleMemory('refine');
+  updateCrab('refine');
+  flashToast(`REFINED +${getImprovementScore()}%`);
 }
 
 const MASTER_AI_ROUTER = `You are the hidden reasoning layer of a prompt-improvement and answer-routing system.
@@ -1384,6 +1646,8 @@ async function updateOutputs(mode = 'both') {
     return;
   }
 
+  localStorage.setItem('canOrNotLastInput', text);
+  updateStyleMemoryFromInput(text, 'submit');
   updateCrab('processing');
   startProcessingAnimation();
   setMode(mode);
@@ -1393,8 +1657,10 @@ async function updateOutputs(mode = 'both') {
 
   const ratingPanel = document.getElementById('ratingPanel');
   const ratingFeedback = document.getElementById('ratingFeedback');
+  const refinePanel = document.getElementById('refinePanel');
   if (ratingPanel) ratingPanel.style.display = 'none';
   if (ratingFeedback) ratingFeedback.classList.remove('open');
+  if (refinePanel) refinePanel.classList.remove('open');
 
   if (mode === 'singlish' || mode === 'both') {
     if (singlishOutput) singlishOutput.textContent = '⏳ Thinking in Singlish...';
@@ -1487,7 +1753,18 @@ if (inputText) {
   let crabTypingTimer;
   inputText.addEventListener('input', () => {
     clearTimeout(crabTypingTimer);
-    crabTypingTimer = setTimeout(() => updateCrab(detectCrabCategory(inputText.value)), 180);
+    crabTypingTimer = setTimeout(() => {
+      updateStyleMemoryFromInput(inputText.value, 'input');
+      updateCrab(detectCrabCategory(inputText.value));
+    }, 180);
+  });
+
+  inputText.addEventListener('paste', () => {
+    clearTimeout(crabTypingTimer);
+    crabTypingTimer = setTimeout(() => {
+      updateStyleMemoryFromInput(inputText.value, 'input');
+      updateCrab(detectCrabCategory(inputText.value), { instant: true });
+    }, 35);
   });
 
   inputText.addEventListener('keydown', (e) => {
@@ -1545,14 +1822,15 @@ if (openChatgptBtn) {
 
 document.querySelectorAll('[data-rating]').forEach((button) => {
   button.addEventListener('click', () => {
+    localStorage.setItem(REMEMBER_UNLOCK_KEY, 'true');
+    bumpStyleMemory('rating');
     updateCrab(button.dataset.rating || 'result');
     const feedback = document.getElementById('ratingFeedback');
-    const section = document.getElementById('cothinkSection');
     if (feedback) {
       feedback.classList.add('open');
       feedback.textContent = '';
       const text = document.createElement('span');
-      text.textContent = 'Saved. Want a stronger version with proper CoThinking? ';
+      text.textContent = 'Saved. Remember mode unlocked. Refine once here or use CoThink for stronger surgery: ';
       const link = document.createElement('a');
       link.href = 'https://co-think-sage.vercel.app';
       link.target = '_blank';
@@ -1561,11 +1839,20 @@ document.querySelectorAll('[data-rating]').forEach((button) => {
       feedback.appendChild(text);
       feedback.appendChild(link);
     }
-    if (section) {
-      setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'center' }), 250);
-    }
+    showRefinePanel(false);
   });
 });
+
+const refineBtn = document.getElementById('refineBtn');
+if (refineBtn) {
+  refineBtn.addEventListener('click', () => {
+    if (localStorage.getItem(REMEMBER_UNLOCK_KEY) !== 'true') {
+      flashToast('RATE ONCE TO UNLOCK');
+      return;
+    }
+    refineCurrentResult();
+  });
+}
 
 function closeAllModals() {
   document.querySelectorAll('.modal-overlay.open').forEach((modal) => modal.classList.remove('open'));
@@ -1603,7 +1890,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 setMode('both');
+incrementVisitCount();
+bumpStyleMemory('visit');
+renderStyleMemory();
 restoreStickyResult();
+const savedLastInput = localStorage.getItem('canOrNotLastInput');
+if (savedLastInput && inputText && !inputText.value.trim()) {
+  inputText.value = savedLastInput;
+  updateStyleMemoryFromInput(savedLastInput, 'input');
+}
+if (getVisitCount() >= FREQUENT_USER_THRESHOLD && !localStorage.getItem(STICKY_RESULT_KEY)) {
+  updateCrab('frequent', { instant: true });
+}
 </script>
 
 <div class="modal-overlay" id="modal-home">
