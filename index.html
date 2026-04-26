@@ -905,6 +905,31 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .single-answer-text{font-size:22px;}
 }
 
+
+/* Compact feedback strip: no statistics, no fake refine panel. */
+.rating-panel{
+  max-width:980px;
+  margin:10px auto 0;
+  border:2px solid var(--line);
+  background:#fff7df;
+  padding:12px 16px 14px;
+  box-shadow:inset 1px 1px 0 #fff, inset -1px -1px 0 #c3c2cc;
+}
+.rating-title{font-size:10px;margin-bottom:8px;}
+.rating-copy{font-family:'VT323', monospace;font-size:21px;line-height:1.15;color:#25252b;margin-bottom:10px;}
+.rating-buttons{display:flex;flex-wrap:wrap;gap:8px;}
+.ratebtn{padding:8px 10px;font-size:9px;}
+.rating-feedback{display:none;margin-top:10px;padding:10px 12px;border:2px solid var(--line);background:#f6f5f9;font-family:'VT323', monospace;font-size:21px;line-height:1.12;}
+.rating-feedback.open{display:block;}
+.rating-feedback a{color:#2f43c7;text-decoration:underline;}
+.next-input-panel{display:none;margin-top:10px;padding:10px 12px;border:2px dashed var(--line);background:#fffdf1;font-family:'VT323', monospace;font-size:21px;line-height:1.12;color:#25252b;}
+.next-input-panel.open{display:block;}
+.next-input-panel strong{font-family:'Press Start 2P', monospace;font-size:9px;}
+@media (max-width: 860px){
+  .rating-panel{margin:8px 0 0;}
+  .rating-copy,.rating-feedback,.next-input-panel{font-size:19px;}
+}
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -1123,38 +1148,19 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </div>
 
 <div class="rating-panel" id="ratingPanel" style="display:none;">
-  <div class="rating-title pixel">RATE ONCE TO UNLOCK REMEMBER MODE</div>
-  <div class="rating-copy">Local Crab wants your judgment. Rate once and I unlock the refine loop.</div>
+  <div class="rating-title pixel">WAS THIS USEFUL?</div>
+  <div class="rating-copy">Rate once so the Crab remembers locally. Then try another input and see another result.</div>
   <div class="rating-buttons">
     <button class="btn pixel ratebtn" type="button" data-rating="cool">COOL</button>
     <button class="btn pixel ratebtn" type="button" data-rating="average">AVERAGE</button>
     <button class="btn pixel ratebtn" type="button" data-rating="sucks">SUCKS</button>
   </div>
   <div class="rating-feedback" id="ratingFeedback">
-    Thanks. Remember mode unlocked. Now refine this result or open CoThink: <a href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">open CoThink →</a>
+    Saved locally. Try another input, see another result. Need deeper cleanup? <a href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">open CoThink →</a>
   </div>
-  <div class="refine-panel" id="refinePanel">
-    <div class="refine-row">
-      <div class="refine-copy">🧬 Remember mode unlocked. One more pass?</div>
-      <button class="btn pixel refinebtn" id="refineBtn" type="button">REFINE ONCE</button>
-    </div>
-    <div class="refine-metric pixel" id="improvementMetric">STYLE IMPROVED +12%</div>
-    <div class="refine-note" id="refineNote">Crab will tighten the wording instantly, no extra API call.</div>
-    <div class="style-memory-panel" id="styleMemoryPanel">
-      <div class="pixel detected-title">STYLE MEMORY</div>
-      <div class="style-memory-row">
-        <span class="style-pill pixel level" id="userLevelPill">LEVEL 1 · BEGINNER</span>
-        <span class="style-pill pixel" id="precisionPill">PRECISION 0%</span>
-        <span class="style-pill pixel" id="visitPill">VISITS 0</span>
-      </div>
-      <div class="style-progress"><div class="style-progress-bar" id="styleProgressBar"></div></div>
-      <div class="style-memory-copy" id="styleMemoryCopy">Rate once to unlock your local style memory.</div>
-      <div class="input-compare-panel" id="inputComparePanel">
-        <div class="input-compare-title">LAST TIME VS NOW</div>
-        <div class="input-compare-copy" id="inputCompareCopy">Last time you wrote like this… today better or not?</div>
-        <div class="input-compare-mini" id="inputCompareMini">Compare appears after you change the restored input.</div>
-      </div>
-    </div>
+  <div class="next-input-panel" id="nextInputPanel">
+    <strong>NEXT STEP</strong><br/>
+    Type or paste another line above. Same box, new result. CoThink is for deeper refining.
   </div>
 </div>
 </section>
@@ -1794,13 +1800,7 @@ function getImprovementScore() {
 }
 
 function showRefinePanel(flash = true) {
-  const panel = document.getElementById('refinePanel');
-  const metric = document.getElementById('improvementMetric');
-  const note = document.getElementById('refineNote');
-  if (metric) metric.textContent = `STYLE IMPROVED +${getImprovementScore()}%`;
-  const memory = getStyleMemory();
-  if (note) note.textContent = `Remember mode is local to this browser. Current level: ${getUserLevel(memory.precision).name}.`;
-  renderStyleMemory(memory);
+  const panel = document.getElementById('nextInputPanel');
   if (panel) panel.classList.add('open');
   if (flash) updateCrab('unlock');
 }
@@ -2420,7 +2420,7 @@ document.querySelectorAll('[data-rating]').forEach((button) => {
       feedback.classList.add('open');
       feedback.textContent = '';
       const text = document.createElement('span');
-      text.textContent = 'Saved. Remember mode unlocked. Refine once here or use CoThink for stronger surgery: ';
+      text.textContent = 'Saved locally. Try another input, see another result. Need deeper cleanup? ';
       const link = document.createElement('a');
       link.href = 'https://co-think-sage.vercel.app';
       link.target = '_blank';
@@ -2436,11 +2436,7 @@ document.querySelectorAll('[data-rating]').forEach((button) => {
 const refineBtn = document.getElementById('refineBtn');
 if (refineBtn) {
   refineBtn.addEventListener('click', () => {
-    if (localStorage.getItem(REMEMBER_UNLOCK_KEY) !== 'true') {
-      flashToast('RATE ONCE TO UNLOCK');
-      return;
-    }
-    refineCurrentResult();
+    window.open('https://co-think-sage.vercel.app', '_blank', 'noopener');
   });
 }
 
