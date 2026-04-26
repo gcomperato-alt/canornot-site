@@ -1303,8 +1303,8 @@ const CRAB_LINES = {
     ['🦀 Blank prompt detected.', 'Even crab needs bait. ↓↓']
   ],
   question: [
-    ['🦀 This one sounds like question.', 'I answer clean first, no drama. ↓↓'],
-    ['🦀 Question smell detected.', 'Let me route it properly. ↓↓'],
+    ['🦀 Ok this one proper question.', 'I answer clean first, no drama. ↓↓'],
+    ['🦀 Clear question. I like.', 'Let me route it properly. ↓↓'],
     ['🦀 You ask, I check.', 'If enough context, I answer. If not, I clean. ↓↓']
   ],
   messy: [
@@ -1497,17 +1497,17 @@ function detectCrabCategory(text) {
   // "where is Marina Bay Sands", "what is...", "how to...", etc.
   const isDirectQuestion =
     /[?？]$/.test(clean) ||
-    /^(what|why|how|when|where|who|which|whose|is|are|am|was|were|can|could|should|would|do|does|did|will|shall|may|might)/i.test(clean) ||
-    /(where is|where are|what is|who is|how do|how to|can i|can we|should i)/i.test(lower);
+    /^(what|why|how|when|where|who|which|whose|is|are|am|was|were|can|could|should|would|do|does|did|will|shall|may|might)\b/i.test(clean) ||
+    /\b(where is|where are|what is|who is|how do|how to|can i|can we|should i)\b/i.test(lower);
 
   // Stale detector remains, but only after we know it is not a normal static location question.
   // "Where is Marina Bay Sands" should route as a question, not as a stale/current-facts warning.
   const staleRisk = detectOutdatedRisk(clean);
-  const looksStaticWhereQuestion = /^where\s+(is|are)/i.test(clean) && !/(now|current|currently|latest|today|tonight|tomorrow|open|closed|price|cost|weather|news|schedule|hours?)/i.test(lower);
+  const looksStaticWhereQuestion = /^where\s+(is|are)\b/i.test(clean) && !/\b(now|current|currently|latest|today|tonight|tomorrow|open|closed|price|cost|weather|news|schedule|hours?)\b/i.test(lower);
   if (staleRisk && !looksStaticWhereQuestion) return 'stale';
 
-  if (/(singlish|lah|leh|lor|sia|can or not|cannot|wah|aiyo)/i.test(clean)) return 'singlish';
-  if (/(prompt|chatgpt|ai|rewrite|improve|clean|make\s+.*better|refine|cothink)/i.test(lower)) return 'prompt';
+  if (/\b(singlish|lah|leh|lor|sia|can or not|cannot|wah|aiyo)\b/i.test(clean)) return 'singlish';
+  if (/\b(prompt|chatgpt|ai|rewrite|improve|clean|make\s+.*better|refine|cothink)\b/i.test(lower)) return 'prompt';
   if (isDirectQuestion) return 'question';
   if (clean.length > 150 || clean.split(/\s+/).length > 24) return 'messy';
   return 'idle';
@@ -1564,9 +1564,9 @@ function scoreInputPrecision(text) {
   if (words.length >= 6) score += 18;
   if (words.length >= 14) score += 14;
   if (/[?？]/.test(clean)) score += 10;
-  if (/(please|thanks|thank you|because|so that|context|goal|audience|tone|format)/i.test(clean)) score += 14;
+  if (/\b(please|thanks|thank you|because|so that|context|goal|audience|tone|format)\b/i.test(clean)) score += 14;
   if (/[,.;:]/.test(clean)) score += 8;
-  if (/(improve|rewrite|answer|summarize|explain|compare|make|turn)/i.test(clean)) score += 10;
+  if (/\b(improve|rewrite|answer|summarize|explain|compare|make|turn)\b/i.test(clean)) score += 10;
   if (words.length > 90) score -= 10;
   if (/(.)\1{5,}/.test(clean)) score -= 8;
   return clampNumber(score, 5, 98);
