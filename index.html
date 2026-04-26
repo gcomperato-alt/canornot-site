@@ -741,6 +741,40 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   line-height:1.15;
 }
 
+.stale-risk-panel{
+  display:none;
+  margin:12px 18px 0;
+  padding:12px 14px;
+  border:2px solid var(--line);
+  background:#fff3c4;
+  box-shadow:2px 2px 0 rgba(0,0,0,.12);
+}
+.stale-risk-panel.open{display:block;}
+.stale-risk-title{font-size:10px;margin-bottom:8px;color:#111;}
+.stale-risk-copy{font-family:'VT323', monospace;font-size:21px;line-height:1.14;color:#25252b;}
+.stale-risk-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px;}
+.stale-risk-btn{padding:9px 12px;font-size:10px;}
+.stale-risk-chip{display:inline-block;padding:5px 8px;border:2px solid var(--line);background:#fff;font-size:9px;color:#111;}
+
+
+.input-feature-hint{
+  padding:9px 16px 10px 18px;
+  border-top:2px solid #c7c6cf;
+  background:#fffdf1;
+  font-family:'VT323', monospace;
+  font-size:19px;
+  line-height:1.12;
+  color:#2f2f37;
+}
+.input-feature-hint strong{
+  font-family:'Press Start 2P', monospace;
+  font-size:9px;
+  color:#111;
+}
+@media (max-width: 860px){
+  .input-feature-hint{font-size:17px;}
+}
+
 .hidden{display:none;}
 @media (max-width: 1200px){
   .hero{padding-top:4px;}
@@ -898,6 +932,10 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </div>
 </div>
 
+<div class="input-feature-hint">
+  <strong>🦀 STALE-ANSWER DETECTOR INCLUDED.</strong> I can spot questions that may expire and send them to CoThink.
+</div>
+
 <div class="crab-helper">
   <img src="cothink-logo.png" alt="CoThink crab thinking partner" />
   <div class="crab-text">
@@ -933,6 +971,15 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <div id="routeReason" class="terminal detected-reason"></div>
 </div>
 </div>
+</div>
+
+<div class="stale-risk-panel" id="staleRiskPanel">
+  <div class="stale-risk-title pixel">⚠ FACT MAY EXPIRE FAST</div>
+  <div class="stale-risk-copy" id="staleRiskCopy">This looks time-sensitive. CanOrNot can shape the answer, but you should verify before trusting it.</div>
+  <div class="stale-risk-actions">
+    <button class="btn pixel stale-risk-btn" id="verifyCothinkBtn" type="button">🦀 CHECK WITH COTHINK</button>
+    <span class="stale-risk-chip pixel" id="staleRiskChip">CURRENT / LATEST / WHO / PRICE / NEWS</span>
+  </div>
 </div>
 
 <div class="rating-panel" id="ratingPanel" style="display:none;">
@@ -1043,6 +1090,7 @@ const sgModeLabel = document.getElementById('sgModeLabel');
 const sgToast = document.getElementById('sgToast');
 
 const urlParams = new URLSearchParams(window.location.search);
+const COTHINK_URL = 'https://co-think-sage.vercel.app';
 
 if (urlParams.get("owner") === "true") {
   localStorage.setItem("canOrNotOwner", "true");
@@ -1075,7 +1123,7 @@ let lastCrabLine = '';
 let crabDelayTimer = null;
 let hasUserMeaningfulInput = false;
 const MIN_MEANINGFUL_INPUT_CHARS = 3;
-const INPUT_ONLY_CRAB_CATEGORIES = new Set(['idle', 'empty', 'question', 'messy', 'singlish', 'prompt', 'frequent', 'sarcastic']);
+const INPUT_ONLY_CRAB_CATEGORIES = new Set(['idle', 'empty', 'question', 'messy', 'singlish', 'prompt', 'frequent', 'sarcastic', 'stale']);
 
 function getCurrentInputValue() {
   return inputText ? inputText.value || '' : '';
@@ -1143,6 +1191,12 @@ const CRAB_LINES = {
     ['🦀 Direct answer route.', 'No need to pretend this was only a prompt. ↓↓'],
     ['🦀 This one I can answer.', 'So I answer instead of polishing air. ↓↓'],
     ['🦀 Clear enough to respond.', 'I give the answer and keep the trail below. ↓↓']
+  ],
+
+  stale: [
+    ['🦀 This one got expiry date.', 'CanOrNot can shape it, but CoThink before you trust it. ↓↓'],
+    ['🦀 Careful ah, current facts move.', 'Use CoThink as the next check layer. ↓↓'],
+    ['🦀 Sounds answerable, but maybe stale.', 'Click the CoThink check before believing. ↓↓']
   ],
   fallback: [
     ['🦀 Backend sleeping.', 'I use local fallback. Useful, but not magic. ↓↓'],
@@ -1248,10 +1302,50 @@ function updateCrab(category = 'idle', options = {}) {
   }, delay);
 }
 
+
+function detectOutdatedRisk(text) {
+  const clean = String(text || '').trim();
+  if (!clean) return null;
+  const lower = clean.toLowerCase();
+  const rules = [
+    { key: 'current', label: 'current / currently / now', re: /\b(current|currently|right now|now|today|this week|this month|this year|as of now)\b/i },
+    { key: 'latest', label: 'latest / news / update', re: /\b(latest|news|update|recent|newest|breaking|just announced)\b/i },
+    { key: 'office-holder', label: 'president / CEO / minister / office holder', re: /\b(who is|who\'s|who leads|president|prime minister|minister|mayor|ceo|cto|founder|owner|chairman|leader|head of|oval office)\b/i },
+    { key: 'price', label: 'price / salary / exchange rate / stock', re: /\b(price|cost|salary|exchange rate|stock|share price|crypto|bitcoin|ethereum|interest rate|inflation)\b/i },
+    { key: 'weather', label: 'weather / traffic / opening hours', re: /\b(weather|traffic|opening hours|open now|closed today|schedule|timetable|flight|train)\b/i },
+    { key: 'date-year', label: '2025 / 2026 / date-sensitive', re: /\b(2025|2026|2027|yesterday|tomorrow)\b/i }
+  ];
+  const hit = rules.find(rule => rule.re.test(clean));
+  return hit || null;
+}
+
+function buildCothinkVerifyUrl(text) {
+  const q = String(text || '').trim();
+  return q ? `${COTHINK_URL}?q=${encodeURIComponent(q)}` : COTHINK_URL;
+}
+
+function renderStaleRisk(text, reason) {
+  const panel = document.getElementById('staleRiskPanel');
+  const copy = document.getElementById('staleRiskCopy');
+  const chip = document.getElementById('staleRiskChip');
+  const btn = document.getElementById('verifyCothinkBtn');
+  if (!panel) return;
+  const risk = reason || detectOutdatedRisk(text);
+  if (!risk) {
+    panel.classList.remove('open');
+    return;
+  }
+  if (copy) copy.textContent = `This question can go stale fast (${risk.label}). CanOrNot can shape the reply, but CoThink is the next check layer before you trust it.`;
+  if (chip) chip.textContent = String(risk.label || 'TIME-SENSITIVE').toUpperCase();
+  if (btn) btn.onclick = () => window.open(buildCothinkVerifyUrl(text), '_blank', 'noopener');
+  panel.classList.add('open');
+}
+
 function detectCrabCategory(text) {
   const clean = (text || '').trim();
   if (!clean) return 'empty';
   const lower = clean.toLowerCase();
+  if (detectOutdatedRisk(clean)) return 'stale';
   if (/(singlish|lah|leh|lor|sia|can or not|cannot|wah|aiyo)/i.test(clean)) return 'singlish';
   if (/(prompt|chatgpt|ai|rewrite|improve|clean|make.*better|refine|cothink)/i.test(lower)) return 'prompt';
   if (/[?？]$/.test(clean) || /^(what|why|how|when|where|who|is|are|can|could|should|would|do|does|did)/i.test(clean)) return 'question';
@@ -1864,14 +1958,17 @@ async function updateOutputs(mode = 'both') {
     if (standardOutput) standardOutput.textContent = '';
     const routeBlock = document.getElementById('routeBadgeBlock');
     if (routeBlock) routeBlock.style.display = 'none';
+    renderStaleRisk('', null);
     stopProcessingAnimation();
     return;
   }
 
   localStorage.setItem(PREVIOUS_INPUT_KEY, localStorage.getItem(CURRENT_INPUT_KEY) || '');
   localStorage.setItem(CURRENT_INPUT_KEY, text);
+  const staleRisk = detectOutdatedRisk(text);
+  renderStaleRisk(text, staleRisk);
   updateStyleMemoryFromInput(text, 'submit');
-  updateCrab('processing');
+  updateCrab(staleRisk ? 'stale' : 'processing');
   startProcessingAnimation();
   setMode(mode);
 
@@ -1930,7 +2027,8 @@ async function updateOutputs(mode = 'both') {
     };
     saveStickyResult(stickySnapshot);
     renderStickyResult(stickySnapshot);
-    updateCrab(payload?.route?.mode === 'ANSWER' ? 'answer' : 'result');
+    renderStaleRisk(text, staleRisk);
+    updateCrab(staleRisk ? 'stale' : (payload?.route?.mode === 'ANSWER' ? 'answer' : 'result'));
     const ratingPanel = document.getElementById('ratingPanel');
     if (ratingPanel) ratingPanel.style.display = 'block';
   } catch (err) {
@@ -1981,11 +2079,13 @@ if (inputText) {
     crabTypingTimer = setTimeout(() => {
       const currentValue = inputText.value || '';
       if (!markInputObservation(currentValue)) {
+        renderStaleRisk('', null);
         updateCrab('ready', { force: true });
         return;
       }
       updateStyleMemoryFromInput(currentValue, 'input');
       renderInputCompare(currentValue, { crab: false });
+      renderStaleRisk(currentValue, detectOutdatedRisk(currentValue));
       updateCrab(detectCrabCategory(currentValue));
     }, 180);
   });
@@ -1995,11 +2095,13 @@ if (inputText) {
     crabTypingTimer = setTimeout(() => {
       const pastedValue = inputText.value || '';
       if (!markInputObservation(pastedValue)) {
+        renderStaleRisk('', null);
         updateCrab('ready', { instant: true, force: true });
         return;
       }
       updateStyleMemoryFromInput(pastedValue, 'input');
       renderInputCompare(pastedValue, { crab: true });
+      renderStaleRisk(pastedValue, detectOutdatedRisk(pastedValue));
       updateCrab(detectCrabCategory(pastedValue), { instant: true });
     }, 35);
   });
@@ -2208,6 +2310,7 @@ if (!hasAnyLocalMemory) {
       <p>You type your original idea or question into the input box.</p>
       <p>The left side gives a natural Singaporean Singlish version.</p>
       <p>The right side either answers your question directly or turns rough wording into clear standard English.</p>
+      <p>It also detects time-sensitive questions like current leaders, news, prices, weather, schedules, and latest questions, then offers a CoThink check.</p>
     </div>
   </div>
 </div>
