@@ -1175,6 +1175,36 @@ const CRAB_LINES = {
     ['🦀 This one again?', 'Never mind. I am trained by suffering, locally. ↓↓'],
     ['🦀 Wah, ambitious mess.', 'I sharpen, you pretend it was planned. ↓↓'],
     ['🦀 I see improvement.', 'Small one. Don’t let it go to your head. ↓↓']
+  ],
+  returningCasual: [
+    ['🦀 Welcome back, buddy.', 'Box clean, claws ready. Put today’s thought inside. ↓↓'],
+    ['🦀 Back again ah.', 'Good. I kept the chair warm, not the demo text. ↓↓'],
+    ['🦀 Hello regular.', 'You know the drill. Feed sentence, receive cleaner thing. ↓↓'],
+    ['🦀 Welcome back.', 'Today we make the wording less blur. ↓↓']
+  ],
+  returningMessy: [
+    ['🦀 Welcome back, chaos friend.', 'I remember your style: foggy but workable. ↓↓'],
+    ['🦀 You again ah…', 'Last time quite messy. Today we try less spaghetti. ↓↓'],
+    ['🦀 Crab recognizes the pattern.', 'Your thoughts arrive like MRT peak hour, but can manage. ↓↓'],
+    ['🦀 Back with another thought pile?', 'No judgment. Small judgment. I clean. ↓↓']
+  ],
+  returningNeat: [
+    ['🦀 Welcome back, sharp one.', 'Your inputs usually not bad. Don’t spoil the record. ↓↓'],
+    ['🦀 Clean writer returned.', 'Crab expects decent material today. Pressure only. ↓↓'],
+    ['🦀 Back again, steady brain.', 'Last style was quite clear. Continue like that. ↓↓'],
+    ['🦀 Regular detected.', 'Your wording has fewer jungle vines now. Good sign. ↓↓']
+  ],
+  messyKnown: [
+    ['🦀 This is your usual fog level.', 'I remember. I brought scissors. ↓↓'],
+    ['🦀 Pattern detected.', 'You write in idea-cloud mode. I compress it. ↓↓'],
+    ['🦀 Messiness familiar already.', 'At least the meaning is trying to escape. ↓↓'],
+    ['🦀 Same species of sentence.', 'Long legs, many claws. I sort it. ↓↓']
+  ],
+  messyImproved: [
+    ['🦀 Less messy today.', 'Don’t panic, improvement is allowed. ↓↓'],
+    ['🦀 This one cleaner than before.', 'Crab noticed. Very dangerous development. ↓↓'],
+    ['🦀 Better shape already.', 'You becoming less fog machine. ↓↓'],
+    ['🦀 Cleaner input detected.', 'I almost had an easy day. Almost. ↓↓']
   ]
 };
 
@@ -1192,12 +1222,40 @@ function pickCrabLine(category = 'idle') {
   return line;
 }
 
+function getMessinessBand(memory = getStyleMemory()) {
+  const mess = Number(memory.messiness || 0);
+  if (mess >= 64) return 'messy';
+  if (mess <= 34 && (memory.submissions || 0) >= 1) return 'neat';
+  return 'normal';
+}
+
+function getReturningCrabCategory() {
+  const memory = getStyleMemory();
+  const visits = getVisitCount();
+  const band = getMessinessBand(memory);
+
+  if (visits <= 2) return 'returning';
+  if (band === 'messy') return Math.random() < 0.72 ? 'returningMessy' : 'returningCasual';
+  if (band === 'neat') return Math.random() < 0.68 ? 'returningNeat' : 'returningCasual';
+  return Math.random() < 0.70 ? 'returningCasual' : 'frequent';
+}
+
 function updateCrab(category = 'idle', options = {}) {
   const memory = getStyleMemory();
   let chosenCategory = category;
+  const band = getMessinessBand(memory);
 
-  if (!options.force && memory.visits >= FREQUENT_USER_THRESHOLD && ['idle', 'messy', 'returning'].includes(category)) {
-    chosenCategory = Math.random() < 0.46 ? 'frequent' : category;
+  if (!options.force && category === 'returning') {
+    chosenCategory = getReturningCrabCategory();
+  }
+
+  if (!options.force && category === 'messy' && memory.submissions >= 1) {
+    if (band === 'messy') chosenCategory = Math.random() < 0.58 ? 'messyKnown' : 'messy';
+    if (band === 'neat') chosenCategory = Math.random() < 0.36 ? 'messyImproved' : 'messy';
+  }
+
+  if (!options.force && memory.visits >= FREQUENT_USER_THRESHOLD && ['idle'].includes(category)) {
+    chosenCategory = Math.random() < 0.46 ? 'frequent' : chosenCategory;
   }
   if (!options.force && memory.refines >= 2 && ['messy', 'prompt'].includes(category)) {
     chosenCategory = Math.random() < 0.28 ? 'sarcastic' : chosenCategory;
@@ -1251,6 +1309,8 @@ function defaultStyleMemory() {
     ratings: 0,
     refines: 0,
     visits: getVisitCount(),
+    messiness: 0,
+    messinessSamples: 0,
     lastLevel: 1,
     lastInputLength: 0,
     lastUpdated: new Date().toISOString()
@@ -1270,6 +1330,25 @@ function saveStyleMemory(memory) {
     memory.lastUpdated = new Date().toISOString();
     localStorage.setItem(STYLE_MEMORY_KEY, JSON.stringify(memory));
   } catch {}
+}
+
+function scoreInputMessiness(text) {
+  const clean = (text || '').trim();
+  if (!clean) return 0;
+  const words = clean.split(/\s+/).filter(Boolean);
+  const avgWordLength = words.length ? clean.replace(/\s+/g, '').length / words.length : 0;
+  let score = 12;
+  if (words.length > 26) score += 18;
+  if (words.length > 55) score += 16;
+  if (!/[,.!?;:]/.test(clean) && words.length > 14) score += 14;
+  if (/(and|then|also|but|so)\b.*\b(and|then|also|but|so)\b/i.test(clean) && words.length > 18) score += 10;
+  if (/[!?]{2,}|\.{4,}/.test(clean)) score += 8;
+  if (/(.)\1{5,}/.test(clean)) score += 8;
+  if (avgWordLength > 8.5) score += 6;
+  if (/\b(whatever|stuff|thing|somehow|kind of|sort of|maybe)\b/i.test(clean)) score += 8;
+  if (/\b(context|goal|audience|tone|format|please|because|so that)\b/i.test(clean)) score -= 12;
+  if (words.length >= 8 && /[,.!?;:]/.test(clean)) score -= 8;
+  return clampNumber(score, 0, 100);
 }
 
 function scoreInputPrecision(text) {
@@ -1302,6 +1381,10 @@ function updateStyleMemoryFromInput(text, eventType = 'input') {
   const oldLevel = getUserLevel(memory.precision).level;
   const weight = eventType === 'submit' ? 0.34 : 0.16;
   memory.precision = Math.round((memory.precision || 0) * (1 - weight) + score * weight);
+  const messyScore = scoreInputMessiness(text);
+  const messyWeight = eventType === 'submit' ? 0.36 : 0.18;
+  memory.messiness = Math.round((memory.messiness || 0) * (1 - messyWeight) + messyScore * messyWeight);
+  memory.messinessSamples = (memory.messinessSamples || 0) + 1;
   memory.lastInputLength = (text || '').trim().length;
   if (eventType === 'submit') memory.submissions += 1;
   const newLevel = getUserLevel(memory.precision).level;
@@ -1331,14 +1414,22 @@ function renderStyleMemory(memory = getStyleMemory()) {
   const bar = document.getElementById('styleProgressBar');
   const copy = document.getElementById('styleMemoryCopy');
   if (levelPill) levelPill.textContent = `LEVEL ${level.level} · ${level.name}`;
-  if (precisionPill) precisionPill.textContent = `PRECISION ${Math.round(memory.precision || 0)}%`;
+  if (precisionPill) {
+    const mess = Math.round(memory.messiness || 0);
+    precisionPill.textContent = `PRECISION ${Math.round(memory.precision || 0)}% · MESS ${mess}%`;
+  }
   if (visitPill) visitPill.textContent = `VISITS ${memory.visits || 0}`;
   if (bar) bar.style.width = `${clampNumber(level.progress, 0, 100)}%`;
   if (copy) {
     const frequent = (memory.visits || 0) >= FREQUENT_USER_THRESHOLD;
     const refined = (memory.refines || 0) > 0;
+    const band = getMessinessBand(memory);
     copy.textContent = frequent
-      ? 'Crab knows your return pattern now. Tone: slightly sharper, still useful.'
+      ? (band === 'messy'
+          ? 'Crab knows your pattern now. Tone: more teasing, because your inputs arrive slightly tangled.'
+          : band === 'neat'
+            ? 'Crab knows your pattern now. Tone: sharper, because your inputs are getting clearer.'
+            : 'Crab knows your return pattern now. Tone: varied, slightly sharper, still useful.')
       : refined
         ? 'Style memory is warming up. More ratings and refinements make the loop stickier.'
         : 'Rate once to unlock your local style memory.';
@@ -1478,8 +1569,7 @@ function restoreStickyResult() {
     const snapshot = getStoredStickySnapshot();
     if (!snapshot) return false;
     renderStickyResult(snapshot);
-    const memory = getStyleMemory();
-    updateCrab(memory.visits >= FREQUENT_USER_THRESHOLD ? 'frequent' : 'returning');
+    updateCrab('returning');
     if (localStorage.getItem(REMEMBER_UNLOCK_KEY) === 'true') showRefinePanel(false);
     renderStyleMemory(memory);
     return true;
@@ -2088,9 +2178,28 @@ document.addEventListener('keydown', (e) => {
 
 
 function getHeroHookLine() {
-  return getStoredStickySnapshot()
-    ? 'The Crab remembers you. I told you already.'
-    : 'The Crab remembers you. Next time, you’ll think better.';
+  const hasMemory = !!getStoredStickySnapshot();
+  const visits = getVisitCount();
+  if (!hasMemory) return 'The Crab remembers you. Next time, you’ll think better.';
+  if (visits <= 2) return 'The Crab remembers you. I told you already.';
+  const band = getMessinessBand();
+  const messyHooks = [
+    'Welcome back, buddy. Less fog today, can?',
+    'The Crab remembers your style. Today we untangle faster.',
+    'Back again ah. The Crab brought scissors.'
+  ];
+  const neatHooks = [
+    'Welcome back, buddy. Your thinking trail is ready.',
+    'The Crab remembers you. Keep the clean streak going.',
+    'Back again. Today you may think even sharper.'
+  ];
+  const normalHooks = [
+    'Welcome back, buddy. The box is ready.',
+    'Back again ah. The Crab is awake.',
+    'The Crab remembers enough. You do the next move.'
+  ];
+  const pool = band === 'messy' ? messyHooks : band === 'neat' ? neatHooks : normalHooks;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function typeHeroHook(line) {
@@ -2137,7 +2246,7 @@ if (!restoredSticky && savedLastInput) {
 }
 typeHeroHook(getHeroHookLine());
 if (getVisitCount() >= FREQUENT_USER_THRESHOLD && !getStoredStickySnapshot()) {
-  updateCrab('frequent', { instant: true });
+  updateCrab('returning', { instant: true });
 }
 </script>
 
