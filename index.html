@@ -884,16 +884,12 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <div class="col">
 <div class="label pink pixel">SINGLISH</div>
 <div class="quote pink pixel">“</div>
-<div class="output-text terminal" id="singlishOutput">Bro, I'm running a bit late.
-Can we push our meeting to 3pm instead?
-Thanks ah!</div>
+<div class="output-text terminal" id="singlishOutput"></div>
 </div>
 <div class="col">
 <div class="label blue pixel">ANSWER / CLEAR VERSION</div>
 <div class="quote blue pixel">“</div>
-<div class="output-text terminal" id="standardOutput">I will be slightly delayed.
-Would it be possible to reschedule our meeting to 3pm?
-Thank you.</div>
+<div class="output-text terminal" id="standardOutput"></div>
 </div>
 <div class="col why-col detected-style-col">
 <div id="routeBadgeBlock" style="display:none;">
@@ -1116,9 +1112,9 @@ const CRAB_LINES = {
     ['🦀 Bad result noted.', 'Don’t throw laptop. Refine below. ↓↓']
   ],
   returning: [
-    ['🦀 Welcome back.', 'I kept your last thought warm. ↓↓'],
-    ['🦀 Your previous input still here.', 'Continue from the trail, don’t restart from zero. ↓↓'],
-    ['🦀 Memory crumb restored.', 'Last result is below. Pick up from there. ↓↓']
+    ['🦀 Welcome back.', 'Clean box, fresh start. ↓↓'],
+    ['🦀 Your previous input may still be here.', 'Send it when you want the crab to work. ↓↓'],
+    ['🦀 Memory crumb checked.', 'No fake demo result. You create the next one. ↓↓']
   ],
   unlock: [
     ['🦀 Rating received.', 'Remember mode unlocked. Now refine your input, can. ↓↓'],
@@ -1415,17 +1411,58 @@ function renderStickyResult(snapshot) {
   if (returnedAnswer) returnedAnswer.textContent = parts.join('\n') || 'Route and direct answer will appear here.';
 }
 
-function restoreStickyResult() {
+function hasRealStickySnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return false;
+  const pieces = [snapshot.input, snapshot.singlish, snapshot.standard, snapshot.answer]
+    .map(v => String(v || '').trim())
+    .filter(Boolean);
+  if (!pieces.length) return false;
+  const joined = pieces.join(' ').toLowerCase();
+  const demoSignals = [
+    "bro, i'm running a bit late",
+    'i will be slightly delayed',
+    'would it be possible to reschedule our meeting',
+    'owner test mode is active'
+  ];
+  return !demoSignals.some(sig => joined.includes(sig));
+}
+
+function getStoredStickySnapshot() {
   try {
     const raw = localStorage.getItem(STICKY_RESULT_KEY);
-    if (!raw) return;
+    if (!raw) return null;
     const snapshot = JSON.parse(raw);
+    return hasRealStickySnapshot(snapshot) ? snapshot : null;
+  } catch {
+    return null;
+  }
+}
+
+function restoreStickyResult() {
+  try {
+    const snapshot = getStoredStickySnapshot();
+    if (!snapshot) return false;
     renderStickyResult(snapshot);
     const memory = getStyleMemory();
     updateCrab(memory.visits >= FREQUENT_USER_THRESHOLD ? 'frequent' : 'returning');
     if (localStorage.getItem(REMEMBER_UNLOCK_KEY) === 'true') showRefinePanel(false);
     renderStyleMemory(memory);
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function restoreFromSavedInputIfNeeded(savedText) {
+  // Clean-start rule: never invent/rebuild a result from saved input.
+  // The result box stays blank until the visitor actually presses SEND.
+  const text = (savedText || '').trim();
+  if (!text) return false;
+  if (singlishOutput) singlishOutput.textContent = '';
+  if (standardOutput) standardOutput.textContent = '';
+  const routeBlock = document.getElementById('routeBadgeBlock');
+  if (routeBlock) routeBlock.style.display = 'none';
+  return false;
 }
 
 function getImprovementScore() {
@@ -1758,8 +1795,10 @@ async function updateOutputs(mode = 'both') {
 
   if (!text) {
     updateCrab('empty');
-    if (singlishOutput) singlishOutput.textContent = 'Type something first.';
-    if (standardOutput) standardOutput.textContent = 'Please enter your text above.';
+    if (singlishOutput) singlishOutput.textContent = '';
+    if (standardOutput) standardOutput.textContent = '';
+    const routeBlock = document.getElementById('routeBadgeBlock');
+    if (routeBlock) routeBlock.style.display = 'none';
     stopProcessingAnimation();
     return;
   }
@@ -2014,8 +2053,7 @@ document.addEventListener('keydown', (e) => {
 
 
 function getHeroHookLine() {
-  const hasMemory = localStorage.getItem(REMEMBER_UNLOCK_KEY) === 'true' || !!localStorage.getItem(STICKY_RESULT_KEY);
-  return hasMemory
+  return getStoredStickySnapshot()
     ? 'The Crab remembers you. I told you already.'
     : 'The Crab remembers you. Next time, you’ll think better.';
 }
@@ -2039,19 +2077,31 @@ function typeHeroHook(line) {
   setTimeout(tick, 360);
 }
 
+// Clean-start migration: remove old bundled demo memory from earlier builds.
+try {
+  const oldSnapshotRaw = localStorage.getItem(STICKY_RESULT_KEY);
+  const oldSnapshot = oldSnapshotRaw ? JSON.parse(oldSnapshotRaw) : null;
+  if (oldSnapshot && !hasRealStickySnapshot(oldSnapshot)) localStorage.removeItem(STICKY_RESULT_KEY);
+} catch {
+  localStorage.removeItem(STICKY_RESULT_KEY);
+}
+
 setMode('both');
 incrementVisitCount();
 bumpStyleMemory('visit');
 renderStyleMemory();
-restoreStickyResult();
-typeHeroHook(getHeroHookLine());
 const savedLastInput = localStorage.getItem(CURRENT_INPUT_KEY);
 if (savedLastInput && inputText && !inputText.value.trim()) {
   inputText.value = savedLastInput;
   updateStyleMemoryFromInput(savedLastInput, 'input');
   renderInputCompare(savedLastInput, { crab: false });
 }
-if (getVisitCount() >= FREQUENT_USER_THRESHOLD && !localStorage.getItem(STICKY_RESULT_KEY)) {
+const restoredSticky = restoreStickyResult();
+if (!restoredSticky && savedLastInput) {
+  restoreFromSavedInputIfNeeded(savedLastInput);
+}
+typeHeroHook(getHeroHookLine());
+if (getVisitCount() >= FREQUENT_USER_THRESHOLD && !getStoredStickySnapshot()) {
   updateCrab('frequent', { instant: true });
 }
 </script>
