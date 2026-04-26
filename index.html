@@ -945,6 +945,175 @@ let lastModeUsed = 'both';
 let lastSinglishPrompt = '';
 let lastChatgptPrompt = '';
 
+const crabTitle = document.querySelector('.crab-title');
+const crabSub = document.querySelector('.crab-sub');
+const crabArrow = document.querySelector('.crab-arrow');
+const STICKY_RESULT_KEY = 'canOrNotStickyResult';
+let lastCrabLine = '';
+
+const CRAB_LINES = {
+  idle: [
+    ['🦀 That one meh…', 'Try CoThink below, I clean it up for you. ↓↓'],
+    ['🦀 Got sentence or not?', 'Drop it in. I check whether can or cannot. ↓↓'],
+    ['🦀 Type first lah.', 'Then I decide: answer, clean, or prompt surgery. ↓↓'],
+    ['🦀 I am watching the input box.', 'Not creepy. Just local quality control. ↓↓']
+  ],
+  empty: [
+    ['🦀 Eh empty box leh.', 'Give me something to chew first. ↓↓'],
+    ['🦀 Cannot cook air.', 'Type a question, sentence, or messy idea. ↓↓'],
+    ['🦀 Blank prompt detected.', 'Even crab needs bait. ↓↓']
+  ],
+  question: [
+    ['🦀 This one sounds like question.', 'I answer clean first, no drama. ↓↓'],
+    ['🦀 Question smell detected.', 'Let me route it properly. ↓↓'],
+    ['🦀 You ask, I check.', 'If enough context, I answer. If not, I clean. ↓↓']
+  ],
+  messy: [
+    ['🦀 This one got jungle vines.', 'I trim until AI can walk through. ↓↓'],
+    ['🦀 Meaning is there, shape not yet.', 'I clean the input without killing it. ↓↓'],
+    ['🦀 A bit anyhow, but can save.', 'Let me straighten the sentence bones. ↓↓']
+  ],
+  singlish: [
+    ['🦀 Local flavour coming.', 'Natural can. Forced lah-lah cannot. ↓↓'],
+    ['🦀 Singlish mode got pulse.', 'I add flavour, not karaoke slang. ↓↓'],
+    ['🦀 Make it local, not cartoon.', 'Steady. I adjust. ↓↓']
+  ],
+  prompt: [
+    ['🦀 Prompt looks undercooked.', 'I make it clearer for ChatGPT. ↓↓'],
+    ['🦀 AI input can be sharper.', 'I remove the fog machine. ↓↓'],
+    ['🦀 CoThinking angle detected.', 'I turn rough intent into usable prompt. ↓↓']
+  ],
+  processing: [
+    ['🦀 Processing now.', 'Tiny claws, big responsibility. ↓↓'],
+    ['🦀 Wait ah.', 'Routing the thought through the local crab tower. ↓↓'],
+    ['🦀 Checking shape.', 'Answer, rewrite, or ask-back. Let me decide. ↓↓']
+  ],
+  result: [
+    ['🦀 Done already.', 'Use this, copy it, or feed it to CoThink. ↓↓'],
+    ['🦀 Result landed.', 'Not perfect? Rate it and I know where it hurts. ↓↓'],
+    ['🦀 Okay, this one has form now.', 'You can copy or continue cleaning. ↓↓']
+  ],
+  answer: [
+    ['🦀 Direct answer route.', 'No need to pretend this was only a prompt. ↓↓'],
+    ['🦀 This one I can answer.', 'So I answer instead of polishing air. ↓↓'],
+    ['🦀 Clear enough to respond.', 'I give the answer and keep the trail below. ↓↓']
+  ],
+  fallback: [
+    ['🦀 Backend sleeping.', 'I use local fallback. Useful, but not magic. ↓↓'],
+    ['🦀 Server not answering.', 'Crab does emergency browser logic only. ↓↓'],
+    ['🦀 Local mode only.', 'Enough for shaping, careful with factual answers. ↓↓']
+  ],
+  error: [
+    ['🦀 Something jammed.', 'The machine coughed. Try again. ↓↓'],
+    ['🦀 Error crab appeared.', 'Not your fault. Probably wiring. ↓↓'],
+    ['🦀 This one tripped.', 'Send again or simplify the input. ↓↓']
+  ],
+  cool: [
+    ['🦀 Cool? Shiok.', 'Now send the cleaned version where it needs to go. ↓↓'],
+    ['🦀 Accepted by human court.', 'CoThink can still polish it further. ↓↓'],
+    ['🦀 Good result, can.', 'Keep the trail. Come back later also can. ↓↓']
+  ],
+  average: [
+    ['🦀 Average only ah.', 'Fair. CoThink can sharpen the weak part. ↓↓'],
+    ['🦀 Not terrible, not champion.', 'Click CoThink and make it less meh. ↓↓'],
+    ['🦀 Middle rating received.', 'Means the crab must work harder. ↓↓']
+  ],
+  sucks: [
+    ['🦀 Sucks? Brutal but useful.', 'Open CoThink. We repair properly. ↓↓'],
+    ['🦀 Ouch. Crab got pinched.', 'Send it to CoThink for stronger surgery. ↓↓'],
+    ['🦀 Bad result noted.', 'Don’t throw laptop. Refine below. ↓↓']
+  ],
+  returning: [
+    ['🦀 Welcome back.', 'I kept your last thought warm. ↓↓'],
+    ['🦀 Your previous input still here.', 'Continue from the trail, don’t restart from zero. ↓↓'],
+    ['🦀 Memory crumb restored.', 'Last result is below. Pick up from there. ↓↓']
+  ]
+};
+
+function pickCrabLine(category = 'idle') {
+  const pool = CRAB_LINES[category] || CRAB_LINES.idle;
+  let line = pool[Math.floor(Math.random() * pool.length)];
+  if (pool.length > 1) {
+    let guard = 0;
+    while (line.join('|') === lastCrabLine && guard < 6) {
+      line = pool[Math.floor(Math.random() * pool.length)];
+      guard += 1;
+    }
+  }
+  lastCrabLine = line.join('|');
+  return line;
+}
+
+function updateCrab(category = 'idle') {
+  const [title, sub] = pickCrabLine(category);
+  if (crabTitle) crabTitle.textContent = title;
+  if (crabSub) crabSub.textContent = sub;
+  if (crabArrow) {
+    crabArrow.textContent = '↓↓';
+    crabArrow.style.animation = 'none';
+    void crabArrow.offsetWidth;
+    crabArrow.style.animation = '';
+  }
+}
+
+function detectCrabCategory(text) {
+  const clean = (text || '').trim();
+  if (!clean) return 'empty';
+  const lower = clean.toLowerCase();
+  if (/(singlish|lah|leh|lor|sia|can or not|cannot|wah|aiyo)/i.test(clean)) return 'singlish';
+  if (/(prompt|chatgpt|ai|rewrite|improve|clean|make.*better|refine|cothink)/i.test(lower)) return 'prompt';
+  if (/[?？]$/.test(clean) || /^(what|why|how|when|where|who|is|are|can|could|should|would|do|does|did)/i.test(clean)) return 'question';
+  if (clean.length > 150 || clean.split(/\s+/).length > 24) return 'messy';
+  return 'idle';
+}
+
+function saveStickyResult(snapshot) {
+  try {
+    localStorage.setItem(STICKY_RESULT_KEY, JSON.stringify({
+      ...snapshot,
+      savedAt: new Date().toISOString()
+    }));
+  } catch {}
+}
+
+function renderStickyResult(snapshot) {
+  const returnedAnswer = document.getElementById('returnedAnswer');
+  if (!returnedAnswer || !snapshot) return;
+
+  const parts = [];
+  if (snapshot.input) {
+    parts.push('Last input:');
+    parts.push(snapshot.input);
+    parts.push('');
+  }
+  if (snapshot.mode) parts.push(`Mode: ${snapshot.mode}`);
+  if (snapshot.source) parts.push(`Source: ${snapshot.source}`);
+  if (snapshot.reason) parts.push(`Reason: ${snapshot.reason}`);
+
+  if (snapshot.answer) {
+    parts.push('');
+    parts.push(snapshot.mode === 'ANSWER' ? 'Direct answer:' : 'Sticky result:');
+    parts.push(snapshot.answer);
+  }
+
+  if (snapshot.savedAt) {
+    parts.push('');
+    parts.push(`Saved locally: ${new Date(snapshot.savedAt).toLocaleString()}`);
+  }
+
+  returnedAnswer.textContent = parts.join('\n') || 'Route and direct answer will appear here.';
+}
+
+function restoreStickyResult() {
+  try {
+    const raw = localStorage.getItem(STICKY_RESULT_KEY);
+    if (!raw) return;
+    const snapshot = JSON.parse(raw);
+    renderStickyResult(snapshot);
+    updateCrab('returning');
+  } catch {}
+}
+
 const MASTER_AI_ROUTER = `You are the hidden reasoning layer of a prompt-improvement and answer-routing system.
 
 Your job is to determine the best handling mode for the user's input.
@@ -1208,12 +1377,14 @@ async function updateOutputs(mode = 'both') {
   const text = inputText?.value.trim() || '';
 
   if (!text) {
+    updateCrab('empty');
     if (singlishOutput) singlishOutput.textContent = 'Type something first.';
     if (standardOutput) standardOutput.textContent = 'Please enter your text above.';
     stopProcessingAnimation();
     return;
   }
 
+  updateCrab('processing');
   startProcessingAnimation();
   setMode(mode);
 
@@ -1244,6 +1415,7 @@ async function updateOutputs(mode = 'both') {
       payload = buildLocalPayload(text, mode);
       applyRouteBadge(payload.route);
       flashToast('LOCAL MODE: BACKEND NOT CONNECTED');
+      updateCrab('fallback');
     }
 
     if ((mode === 'singlish' || mode === 'both') && payload?.singlish) {
@@ -1256,24 +1428,22 @@ async function updateOutputs(mode = 'both') {
       setOutput(standardOutput, lastChatgptPrompt);
     }
 
-    const returnedAnswer = document.getElementById('returnedAnswer');
-    if (returnedAnswer) {
-      const parts = [];
-      if (payload?.route?.mode) parts.push(`Mode: ${payload.route.mode}`);
-      if (payload?.source) parts.push(`Source: ${payload.source}`);
-      if (payload?.route?.reason) parts.push(`Reason: ${payload.route.reason}`);
-
-      if (payload?.route?.mode === 'ANSWER' && payload?.standard) {
-        parts.push('');
-        parts.push('Direct answer:');
-        parts.push(payload.standard);
-      }
-
-      returnedAnswer.textContent = parts.join('\n');
-    }
+    const stickySnapshot = {
+      input: text,
+      mode: payload?.route?.mode || mode.toUpperCase(),
+      source: payload?.source || '',
+      reason: payload?.route?.reason || '',
+      answer: (payload?.route?.mode === 'ANSWER' && payload?.standard)
+        ? payload.standard.trim()
+        : (payload?.standard || payload?.singlish || '').trim()
+    };
+    saveStickyResult(stickySnapshot);
+    renderStickyResult(stickySnapshot);
+    updateCrab(payload?.route?.mode === 'ANSWER' ? 'answer' : 'result');
     const ratingPanel = document.getElementById('ratingPanel');
     if (ratingPanel) ratingPanel.style.display = 'block';
   } catch (err) {
+    updateCrab('error');
     flashToast('ERROR: ' + String(err.message || err).slice(0, 44));
     if (singlishOutput && (mode === 'singlish' || mode === 'both')) singlishOutput.textContent = 'Error: ' + err.message;
     if (standardOutput && (mode === 'standard' || mode === 'both')) standardOutput.textContent = 'Error: ' + err.message;
@@ -1314,6 +1484,12 @@ if (standardBtn) {
 }
 
 if (inputText) {
+  let crabTypingTimer;
+  inputText.addEventListener('input', () => {
+    clearTimeout(crabTypingTimer);
+    crabTypingTimer = setTimeout(() => updateCrab(detectCrabCategory(inputText.value)), 180);
+  });
+
   inputText.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       updateOutputs('both');
@@ -1369,13 +1545,14 @@ if (openChatgptBtn) {
 
 document.querySelectorAll('[data-rating]').forEach((button) => {
   button.addEventListener('click', () => {
+    updateCrab(button.dataset.rating || 'result');
     const feedback = document.getElementById('ratingFeedback');
     const section = document.getElementById('cothinkSection');
     if (feedback) {
       feedback.classList.add('open');
       feedback.textContent = '';
       const text = document.createElement('span');
-      text.textContent = 'Thanks. Now let me improve your English and AI input properly: ';
+      text.textContent = 'Saved. Want a stronger version with proper CoThinking? ';
       const link = document.createElement('a');
       link.href = 'https://co-think-sage.vercel.app';
       link.target = '_blank';
@@ -1426,6 +1603,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 setMode('both');
+restoreStickyResult();
 </script>
 
 <div class="modal-overlay" id="modal-home">
