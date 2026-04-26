@@ -187,6 +187,27 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   animation:none;
   opacity:.65;
 }
+
+.crab-identity-line{
+  margin-top:6px;
+  font-size:19px;
+  line-height:1.1;
+  color:#25252b;
+  text-align:center;
+}
+.crab-identity-line strong{
+  font-family:'Press Start 2P', monospace;
+  font-size:10px;
+  color:#111;
+}
+@media (max-width: 860px){
+  .crab-identity-line{
+    font-size:17px;
+    padding:0 10px;
+  }
+  .crab-identity-line strong{font-size:8px;}
+}
+
 @keyframes hookBlink{
   0%,48%{opacity:1;}
   49%,100%{opacity:0;}
@@ -1063,6 +1084,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   <span>with AI</span>
 </div>
 <div class="crab-hook pixel"><span id="heroTypewriter"></span><span class="cursor">▌</span></div>
+<div class="crab-identity-line terminal"><strong>🦀 This one not normal AI.</strong><br/>I remember how you think.</div>
 </div>
 </section>
 <section class="main-chat-window">
@@ -1267,6 +1289,7 @@ const OUTPUT_PREF_KEY = 'canOrNotOutputPreference';
 const IMPROVEMENT_KEY = 'canOrNotImprovementScore';
 const STYLE_MEMORY_KEY = 'canOrNotStyleMemory';
 const VISIT_COUNT_KEY = 'canOrNotVisitCount';
+const CRAB_PERSONALITY_KEY = 'canOrNotCrabPersonality';
 const PREVIOUS_INPUT_KEY = 'canOrNotPreviousInput';
 const CURRENT_INPUT_KEY = 'canOrNotLastInput';
 const FREQUENT_USER_THRESHOLD = 4;
@@ -1343,6 +1366,12 @@ const CRAB_LINES = {
     ['🦀 This one I can answer.', 'So I answer instead of polishing air. ↓↓'],
     ['🦀 Clear enough to respond.', 'I give the answer and keep the trail below. ↓↓']
   ],
+  selfRef: [
+    ['🦀 Wah… you asking me how to cook me ah?', 'I answer, but emotionally difficult. ↓↓'],
+    ['🦀 This one personal already leh.', 'Still can help. I am professional crab. ↓↓'],
+    ['🦀 Crab detected in crab territory.', 'I will not overthink my own destiny. ↓↓'],
+    ['🦀 You want crab advice from crab?', 'Bold strategy. I respect the chaos. ↓↓']
+  ],
 
   stale: [
     ['🦀 This one got expiry date.', 'CanOrNot can shape it, but CoThink before you trust it. ↓↓'],
@@ -1373,6 +1402,32 @@ const CRAB_LINES = {
     ['🦀 Sucks? Brutal but useful.', 'Open CoThink. We repair properly. ↓↓'],
     ['🦀 Ouch. Crab got pinched.', 'Send it to CoThink for stronger surgery. ↓↓'],
     ['🦀 Bad result noted.', 'Don’t throw laptop. Refine below. ↓↓']
+  ],
+
+  moodWarm: [
+    ['🦀 Crab mood: steady.', 'I know this rhythm already. Type, I shape. ↓↓'],
+    ['🦀 Familiar human detected.', 'Your input pattern got smell already. In a good way. ↓↓'],
+    ['🦀 Local crab warmed up.', 'Less lecture, more useful. Send it. ↓↓']
+  ],
+  moodSnark: [
+    ['🦀 Crab mood: slightly judging.', 'Not angry. Just quality control with claws. ↓↓'],
+    ['🦀 I have seen your style before.', 'Today we try less fog, can? ↓↓'],
+    ['🦀 This input better behave.', 'I am in professional side-eye mode. ↓↓']
+  ],
+  moodGrudge: [
+    ['🦀 Crab remembers the bad rating.', 'I forgive slowly. Type carefully. ↓↓'],
+    ['🦀 Small grudge active.', 'Don’t worry, still helping. I am petty, not useless. ↓↓'],
+    ['🦀 You hurt the crab last time.', 'But ok lah, one more chance. ↓↓']
+  ],
+  moodChaos: [
+    ['🦀 Crab mood: chilli chaos.', 'Somehow this may work. Send. ↓↓'],
+    ['🦀 Today the crab is overcaffeinated.', 'Input goes in, better version crawls out. ↓↓'],
+    ['🦀 Local crab unlocked weird mode.', 'Not normal AI, remember? ↓↓']
+  ],
+  moodLevel: [
+    ['🦀 Crab level increased.', 'I know your habits a bit too well now. ↓↓'],
+    ['🦀 Returning-user smell detected.', 'The box remembers locally. I judge accordingly. ↓↓'],
+    ['🦀 Higher crab familiarity.', 'Less explaining, more reacting. ↓↓']
   ],
   returning: [
     ['🦀 Welcome back.', 'Clean box, fresh start. ↓↓'],
@@ -1406,6 +1461,69 @@ const CRAB_LINES = {
   ]
 };
 
+
+function defaultCrabPersonality() {
+  return {
+    interactions: 0,
+    grudge: 0,
+    mood: 'warm',
+    lastRating: '',
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+function getCrabPersonality() {
+  try {
+    return { ...defaultCrabPersonality(), ...(JSON.parse(localStorage.getItem(CRAB_PERSONALITY_KEY) || '{}') || {}) };
+  } catch {
+    return defaultCrabPersonality();
+  }
+}
+
+function saveCrabPersonality(personality) {
+  try {
+    personality.lastUpdated = new Date().toISOString();
+    localStorage.setItem(CRAB_PERSONALITY_KEY, JSON.stringify(personality));
+  } catch {}
+}
+
+function recordCrabInteraction(type = 'input') {
+  const p = getCrabPersonality();
+  p.interactions = clampNumber(p.interactions, 0, 9999) + 1;
+  if (type === 'submit' && p.interactions >= 8 && p.grudge <= 0) p.mood = 'level';
+  if (type === 'submit' && p.interactions >= 14 && p.grudge <= 1 && Math.random() < 0.35) p.mood = 'chaos';
+  saveCrabPersonality(p);
+  return p;
+}
+
+function recordCrabRating(rating = '') {
+  const p = getCrabPersonality();
+  p.lastRating = rating;
+  p.interactions = clampNumber(p.interactions, 0, 9999) + 1;
+  if (rating === 'sucks') {
+    p.grudge = clampNumber(p.grudge, 0, 9) + 1;
+    p.mood = 'grudge';
+  } else if (rating === 'average') {
+    p.grudge = Math.max(0, clampNumber(p.grudge, 0, 9) - 1);
+    p.mood = 'snark';
+  } else if (rating === 'cool') {
+    p.grudge = Math.max(0, clampNumber(p.grudge, 0, 9) - 2);
+    p.mood = 'warm';
+  }
+  saveCrabPersonality(p);
+  return p;
+}
+
+function getCrabMoodCategory() {
+  const p = getCrabPersonality();
+  if (p.grudge >= 2) return 'moodGrudge';
+  if (p.mood === 'grudge') return 'moodGrudge';
+  if (p.mood === 'snark') return 'moodSnark';
+  if (p.mood === 'chaos') return 'moodChaos';
+  if (p.mood === 'level' || p.interactions >= 8) return 'moodLevel';
+  return 'moodWarm';
+}
+
 function pickCrabLine(category = 'idle') {
   const pool = CRAB_LINES[category] || CRAB_LINES.idle;
   let line = pool[Math.floor(Math.random() * pool.length)];
@@ -1436,6 +1554,12 @@ function updateCrab(category = 'idle', options = {}) {
   }
   if (!options.force && currentHasInput && memory.refines >= 2 && ['messy', 'prompt'].includes(category)) {
     chosenCategory = Math.random() < 0.28 ? 'sarcastic' : chosenCategory;
+  }
+
+  const protectedCrabCategories = new Set(['selfRef', 'stale', 'error', 'fallback', 'processing']);
+  if (!options.force && currentHasInput && !protectedCrabCategories.has(chosenCategory)) {
+    const moodChance = getCrabPersonality().grudge > 0 ? 0.34 : 0.22;
+    if (Math.random() < moodChance) chosenCategory = getCrabMoodCategory();
   }
 
   const [title, sub] = pickCrabLine(chosenCategory);
@@ -1492,11 +1616,34 @@ function renderStaleRisk(text, reason) {
   panel.classList.add('open');
 }
 
+function isCrabSelfReference(text) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  if (!clean) return false;
+  const mentionsCrab = /\b(crab|crabs|chilli crab|chili crab|local crab)\b/i.test(clean);
+  if (!mentionsCrab) return false;
+  const cookingIntent = /\b(cook|steam|boil|eat|recipe|serve|butter|sauce|dish|food|how to|best way)\b/i.test(clean);
+  const directAddress = /\b(you|yourself|local crab|this crab)\b/i.test(clean);
+  return cookingIntent || directAddress;
+}
+
+function shouldUseSelfAwareCrab(text) {
+  return isCrabSelfReference(text) && Math.random() < 0.5;
+}
+
+function getPostSubmitCrabCategory(text, staleRisk, payload) {
+  if (!staleRisk && shouldUseSelfAwareCrab(text)) return 'selfRef';
+  return staleRisk ? 'stale' : (payload?.route?.mode === 'ANSWER' ? 'answer' : 'result');
+}
+
 function detectCrabCategory(text) {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return 'empty';
 
   const lower = clean.toLowerCase();
+
+  // Half the time, let the crab notice when the user asks crab-related things.
+  // This keeps the self-aware joke alive without turning every crab mention into a forced gag.
+  if (shouldUseSelfAwareCrab(clean)) return 'selfRef';
 
   // Clear direct questions should feel observed, not dismissed as "meh".
   // This catches natural questions even without a question mark:
@@ -2213,6 +2360,7 @@ async function updateOutputs(mode = 'both') {
   }
   localStorage.setItem(PREVIOUS_INPUT_KEY, previousCurrentInput);
   localStorage.setItem(CURRENT_INPUT_KEY, text);
+  recordCrabInteraction('submit');
   const staleRisk = detectOutdatedRisk(text);
   renderStaleRisk(text, staleRisk);
   updateStyleMemoryFromInput(text, 'submit');
@@ -2277,7 +2425,7 @@ async function updateOutputs(mode = 'both') {
     saveStickyResult(stickySnapshot);
     renderStickyResult(stickySnapshot);
     renderStaleRisk(text, staleRisk);
-    updateCrab(staleRisk ? 'stale' : (payload?.route?.mode === 'ANSWER' ? 'answer' : 'result'));
+    updateCrab(getPostSubmitCrabCategory(text, staleRisk, payload));
     const ratingPanel = document.getElementById('ratingPanel');
     if (ratingPanel) ratingPanel.style.display = 'block';
   } catch (err) {
@@ -2413,8 +2561,10 @@ if (openChatgptBtn) {
 document.querySelectorAll('[data-rating]').forEach((button) => {
   button.addEventListener('click', () => {
     localStorage.setItem(REMEMBER_UNLOCK_KEY, 'true');
+    const ratingChoice = button.dataset.rating || 'result';
+    recordCrabRating(ratingChoice);
     bumpStyleMemory('rating');
-    updateCrab(button.dataset.rating || 'result');
+    updateCrab(ratingChoice);
     const feedback = document.getElementById('ratingFeedback');
     if (feedback) {
       feedback.classList.add('open');
