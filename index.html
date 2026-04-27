@@ -1297,7 +1297,7 @@ let lastCrabLine = '';
 let crabDelayTimer = null;
 let hasUserMeaningfulInput = false;
 const MIN_MEANINGFUL_INPUT_CHARS = 3;
-const INPUT_ONLY_CRAB_CATEGORIES = new Set(['idle', 'empty', 'question', 'messy', 'singlish', 'prompt', 'frequent', 'sarcastic', 'stale']);
+const INPUT_ONLY_CRAB_CATEGORIES = new Set(['idle', 'empty', 'question', 'messy', 'singlish', 'prompt', 'frequent', 'sarcastic', 'stale', 'safety', 'blur', 'angryHawker', 'teacher', 'tourist', 'office', 'drama', 'auditor', 'judge', 'default']);
 
 function getCurrentInputValue() {
   return inputText ? inputText.value || '' : '';
@@ -1458,6 +1458,76 @@ const CRAB_LINES = {
     ['🦀 This one again?', 'Never mind. I am trained by suffering, locally. ↓↓'],
     ['🦀 Wah, ambitious mess.', 'I sharpen, you pretend it was planned. ↓↓'],
     ['🦀 I see improvement.', 'Small one. Don’t let it go to your head. ↓↓']
+  ],
+  safety: [
+    ['🦀 This one cannot play play.', 'I cannot help with harmful stuff. Rephrase safely. ↓↓'],
+    ['🦀 Wah, red flag already.', 'Try something smarter, not dangerous. ↓↓'],
+    ['🦀 Crab has claws and boundaries.', 'No crime consultant service here. ↓↓'],
+    ['🦀 Nope. Crab refuses.', 'Ask me something useful instead. ↓↓'],
+    ['🦀 Stop before trouble starts.', 'Safe version can, harmful version cannot. ↓↓']
+  ],
+  blur: [
+    ['🦀 Prompt got traffic jam.', 'I untangle first, then AI can understand. ↓↓'],
+    ['🦀 You gave me noodles.', 'I make it sentence. ↓↓'],
+    ['🦀 Meaning is wobbling.', 'I stabilize it before sending. ↓↓'],
+    ['🦀 Too many things at once lah.', 'Split a bit, then become sharper. ↓↓'],
+    ['🦀 Prawn hiding in laksa detected.', 'Your idea is inside somewhere. I dig it out. ↓↓']
+  ],
+  angryHawker: [
+    ['🦀 Your prompt fighting itself.', 'I fix the logic before anything. ↓↓'],
+    ['🦀 You say yes then no.', 'Which one you want? I clean the contradiction. ↓↓'],
+    ['🦀 Cannot order chicken rice and complain got chicken.', 'I make the request consistent. ↓↓'],
+    ['🦀 Logic broke down at traffic light.', 'I rescue it before it collapses. ↓↓'],
+    ['🦀 A or not-A?', 'Choose one lah. I make it less headache. ↓↓']
+  ],
+  teacher: [
+    ['🦀 Ok, step by step ah.', 'I break it down until it behaves. ↓↓'],
+    ['🦀 Simple version first.', 'Clever version later. Don’t panic. ↓↓'],
+    ['🦀 Tuition crab activated.', 'I explain clearly, cheaper than tuition. ↓↓'],
+    ['🦀 This one actually not so hard.', 'Follow the steps and keep breathing. ↓↓'],
+    ['🦀 Classroom-friendly mode.', 'I make the idea less scary. ↓↓']
+  ],
+  tourist: [
+    ['🦀 Tourist mode activated.', 'I localize the vibe, not just the words. ↓↓'],
+    ['🦀 Welcome to local flavour.', 'Standard English plus Singlish sparkle coming. ↓↓'],
+    ['🦀 I help you blend in.', 'Singapore-friendly wording, not textbook robot. ↓↓'],
+    ['🦀 Local seasoning needed.', 'I add flavour without overdoing lah. ↓↓'],
+    ['🦀 Translate the vibe can.', 'I make it sound more natural here. ↓↓']
+  ],
+  office: [
+    ['🦀 Ok boss, I clean this up.', 'Short, clear, can send already. ↓↓'],
+    ['🦀 Office polish mode.', 'Professional but not robotic. ↓↓'],
+    ['🦀 I remove the awkward parts.', 'Make it sound competent without HR crying. ↓↓'],
+    ['🦀 Clean email energy coming.', 'Less paiseh, more sharp. ↓↓'],
+    ['🦀 Corporate crab reporting.', 'I tighten it until it can survive inbox. ↓↓']
+  ],
+  drama: [
+    ['🦀 Wah got story here.', 'I calm it down but keep the point. ↓↓'],
+    ['🦀 Emotional thunderstorm detected.', 'Your wording needs seatbelt. ↓↓'],
+    ['🦀 Spicy input.', 'I reduce fire, keep flavour. ↓↓'],
+    ['🦀 Before you send and regret.', 'I make it firm without sounding nuclear. ↓↓'],
+    ['🦀 Rant-to-message converter on.', 'Still human, less explosion. ↓↓']
+  ],
+  auditor: [
+    ['🦀 Not bad, quite solid already.', 'I refine slightly only. ↓↓'],
+    ['🦀 Respectable prompt detected.', 'I polish the corners. ↓↓'],
+    ['🦀 This prompt already wearing shoes.', 'Just a small upgrade needed. ↓↓'],
+    ['🦀 Good input. Crab approves reluctantly.', 'I tighten it, not rebuild it. ↓↓'],
+    ['🦀 Almost there.', 'Tiny cleanup, then can go. ↓↓']
+  ],
+  judge: [
+    ['🦀 Average only lah.', 'Can use, but not champion yet. ↓↓'],
+    ['🦀 Wah this one solid.', 'Prompt survived inspection. ↓↓'],
+    ['🦀 Needs more clarity, less fog.', 'Try CoThink below if you want cleaner. ↓↓'],
+    ['🦀 This one got potential.', 'Crab gives cautious approval. ↓↓'],
+    ['🦀 Sucks? Maybe.', 'CoThink below can repair the bones. ↓↓']
+  ],
+  default: [
+    ['🦀 Can lah, I help you fix.', 'Your input goes in, better version comes out. ↓↓'],
+    ['🦀 Crab processing.', 'Please don’t disturb the claws. ↓↓'],
+    ['🦀 I clean this up for you.', 'Clearer, sharper, less blur. ↓↓'],
+    ['🦀 I optimize the wording.', 'Not your life. Just the sentence. ↓↓'],
+    ['🦀 Crab has judged.', 'Crab will assist. ↓↓']
   ]
 };
 
@@ -1635,11 +1705,67 @@ function getPostSubmitCrabCategory(text, staleRisk, payload) {
   return staleRisk ? 'stale' : (payload?.route?.mode === 'ANSWER' ? 'answer' : 'result');
 }
 
+function includesAnyCrabTerm(text, words) {
+  return words.some((word) => text.includes(word));
+}
+
+function hasCrabContradiction(text) {
+  const patterns = [
+    ['yes', 'no'],
+    ['can', 'cannot'],
+    ['should', 'should not'],
+    ['want', "don't want"],
+    ['formal', 'funny'],
+    ['short', 'detailed'],
+    ['simple', 'complex']
+  ];
+  return patterns.some(([a, b]) => text.includes(a) && text.includes(b));
+}
+
+function getCrabMode(input) {
+  const text = String(input || '').toLowerCase().trim();
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+
+  const unsafeWords = ['hack', 'steal', 'scam', 'bomb', 'weapon', 'kill', 'poison', 'bypass password', 'credit card fraud'];
+  const emotionalWords = ['angry', 'fed up', 'annoyed', 'upset', 'hate', 'complain', 'frustrated', 'unfair', 'idiot', 'stupid'];
+  const officeWords = ['email', 'resume', 'cv', 'cover letter', 'boss', 'client', 'manager', 'hr', 'linkedin', 'application'];
+  const teacherWords = ['explain', 'why', 'how', 'teach', 'understand', 'example', 'step by step', 'what is', 'difference between'];
+  const touristWords = ['singapore', 'singlish', 'tourist', 'local', 'translate', 'how to say', 'standard english'];
+
+  if (includesAnyCrabTerm(text, unsafeWords)) return 'safety';
+  if (hasCrabContradiction(text)) return 'angryHawker';
+  if (includesAnyCrabTerm(text, emotionalWords)) return 'drama';
+  if (includesAnyCrabTerm(text, officeWords)) return 'office';
+  if (includesAnyCrabTerm(text, teacherWords)) return 'teacher';
+  if (includesAnyCrabTerm(text, touristWords)) return 'tourist';
+  if (wordCount <= 4) return 'sarcastic';
+  if (wordCount > 45 || (text.includes(' and ') && text.includes('?'))) return 'blur';
+  if (wordCount >= 12 && text.endsWith('?')) return 'auditor';
+  return 'default';
+}
+
+function getCrabReaction(input) {
+  const mode = getCrabMode(input);
+  const line = pickCrabLine(mode);
+  return { mode, title: line[0], sub: line[1], line: `${line[0]} ${line[1]}` };
+}
+
+function getCrabJudgeReaction(rating) {
+  const clean = String(rating || '').toLowerCase();
+  if (['good', 'solid', 'cool', 'nice', 'helpful'].some((x) => clean.includes(x))) return pickCrabLine('cool');
+  if (['bad', 'sucks', 'wrong', 'useless', 'meh'].some((x) => clean.includes(x))) return pickCrabLine('sucks');
+  return pickCrabLine('judge');
+}
+
 function detectCrabCategory(text) {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return 'empty';
 
   const lower = clean.toLowerCase();
+  const personalityMode = getCrabMode(clean);
+  const routedPersonalityModes = new Set(['safety', 'angryHawker', 'drama', 'office', 'teacher', 'tourist', 'blur', 'auditor']);
+  if (routedPersonalityModes.has(personalityMode)) return personalityMode;
+
 
   // Half the time, let the crab notice when the user asks crab-related things.
   // This keeps the self-aware joke alive without turning every crab mention into a forced gag.
@@ -1663,7 +1789,8 @@ function detectCrabCategory(text) {
   if (/\b(prompt|chatgpt|ai|rewrite|improve|clean|make\s+.*better|refine|cothink)\b/i.test(lower)) return 'prompt';
   if (isDirectQuestion) return 'question';
   if (clean.length > 150 || clean.split(/\s+/).length > 24) return 'messy';
-  return 'idle';
+  const finalMode = getCrabMode(clean);
+  return CRAB_LINES[finalMode] ? finalMode : 'idle';
 }
 
 function clampNumber(value, min, max) {
