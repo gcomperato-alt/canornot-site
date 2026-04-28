@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Travel Profile</title>
+</head>
+<body>
+
+<h1>Travel Profile</h1>
+
+<input id="name" placeholder="Name">
+<button onclick="saveProfile()">Save</button>
+
+<script>
+function saveProfile() {
+  const profile = {
+    name: document.getElementById("name").value
+  };
+
+  localStorage.setItem("canornot_travel_profile", JSON.stringify(profile));
+  alert("Saved");
+}
+</script>
+
+</body>
+</html>
