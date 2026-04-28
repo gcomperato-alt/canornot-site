@@ -1,144 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>CanOrNot MDAC Helper</title>
+  <meta charset="UTF-8" />
+  <title>CanOrNot MDAC Helper</title>
 
-<style>
-body {
-  font-family: Arial;
-  max-width: 760px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #fffdf5;
-}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 820px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fffdf5;
+      color: #222;
+    }
 
-.section {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
+    h1 {
+      color: #d35400;
+    }
 
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 8px;
-}
+    .section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
 
-button {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  background: #e67e22;
-  color: white;
-  cursor: pointer;
-}
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
 
-.note {
-  background: #fff3cd;
-  padding: 10px;
-  border-radius: 8px;
-}
-</style>
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #e67e22;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #ca6f1e;
+    }
+
+    .note {
+      font-size: 0.95rem;
+      color: #333;
+      background: #fff3cd;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .copy-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-row input {
+      flex: 1;
+    }
+
+    .copy-row button {
+      width: 90px;
+      margin-top: 5px;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>🦀 CanOrNot MDAC Helper</h1>
+  <h1>🦀 CanOrNot MDAC Helper</h1>
 
-<p class="note">
-🔒 Your data stays on your device.<br>
-Nothing is uploaded. Everything is stored in your browser only.<br><br>
-Built by Giuliano Comperato (Singapore)
-</p>
+  <p class="note">
+    🔒 <strong>Your data stays on your device.</strong><br>
+    Nothing is uploaded. Nothing is sent to a server. This helper stores your details only in your own browser using localStorage.<br><br>
+    Built by Giuliano Comperato (Singapore).<br>
+    This is a convenience helper. Always check your information carefully on the official MDAC website before submitting.
+  </p>
 
-<button onclick="openMDAC()">Open Official MDAC Form</button>
-<button onclick="showSavedData()">View Saved Data</button>
-<button onclick="clearData()">Delete All Data</button>
+  <div class="button-row">
+    <button type="button" onclick="openMDAC()">Open Official MDAC Form</button>
+    <button type="button" onclick="saveData()">Save Now</button>
+    <button type="button" onclick="showSavedData()">View Saved Data</button>
+    <button type="button" onclick="clearData()">Delete All Data</button>
+  </div>
 
-<div class="section">
-<h2>Personal Info</h2>
+  <div class="section">
+    <h2>Personal Information</h2>
 
-<input id="name" placeholder="Name">
-<input id="passport" placeholder="Passport No">
-<input id="nationality" placeholder="Nationality">
-<input id="dob" placeholder="DD/MM/YYYY">
-<input id="passportExpiry" placeholder="DD/MM/YYYY">
+    <label>Name</label>
+    <input id="name" placeholder="GIULIANO COMPERATO">
 
-</div>
+    <label>Passport No.</label>
+    <input id="passport" placeholder="Passport number">
 
-<div class="section">
-<h2>Travel</h2>
+    <label>Nationality / Citizenship</label>
+    <input id="nationality" placeholder="Germany">
 
-<input id="arrival" placeholder="DD/MM/YYYY">
-<input id="departure" placeholder="DD/MM/YYYY">
-<textarea id="address" placeholder="Hotel Address"></textarea>
+    <label>Date of Birth</label>
+    <input id="dob" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
 
-</div>
+    <label>Place of Birth</label>
+    <input id="birthplace" placeholder="Germany">
+
+    <label>Sex</label>
+    <select id="sex">
+      <option value="">Please choose</option>
+      <option>Male</option>
+      <option>Female</option>
+    </select>
+
+    <label>Date of Passport Expiry</label>
+    <input id="passportExpiry" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
+
+    <label>Email Address</label>
+    <input id="email" type="email" placeholder="your@email.com">
+
+    <label>Confirm Email Address</label>
+    <input id="confirmEmail" type="email" placeholder="your@email.com">
+
+    <label>Country / Region Code</label>
+    <input id="countryCode" placeholder="+65">
+
+    <label>Mobile No.</label>
+    <input id="mobile" placeholder="Mobile number">
+  </div>
+
+  <div class="section">
+    <h2>Travel Information</h2>
+
+    <p class="small">MDAC usually requires your trip to be within 3 days, including the submission date.</p>
+
+    <label>Date of Arrival</label>
+    <input id="arrival" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
+
+    <label>Date of Departure</label>
+    <input id="departure" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
+
+    <label>Mode of Travel</label>
+    <input id="modeTravel" placeholder="Air / Land / Sea">
+
+    <label>Last Port of Embarkation before Malaysia</label>
+    <input id="lastPort" placeholder="Singapore">
+
+    <label>Flight / Vessel / Transportation No.</label>
+    <input id="transportNo" placeholder="Bus / car / flight number if applicable">
+
+    <label>Accommodation of Stay</label>
+    <input id="accommodation" placeholder="Hotel">
+
+    <label>Address in Malaysia</label>
+    <textarea id="address" rows="3" placeholder="Hotel name and address"></textarea>
+
+    <label>State</label>
+    <input id="state" placeholder="Johor">
+
+    <label>City</label>
+    <input id="city" placeholder="Johor Bahru">
+
+    <label>Postcode</label>
+    <input id="postcode" placeholder="80000">
+  </div>
+
+  <div class="section">
+    <h2>Quick Hotel Example</h2>
+
+    <button type="button" onclick="fillJBHotel()">Fill JB Hotel Example</button>
+
+    <p class="small">
+      This fills a simple Johor Bahru hotel-style stay. Change it if you have your real hotel later.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Copy Panel</h2>
+    <p class="small">Copy each value into the official MDAC form.</p>
+    <div id="copyPanel"></div>
+  </div>
 
 <script>
+const fields = [
+  ["Name", "name"],
+  ["Passport No.", "passport"],
+  ["Nationality / Citizenship", "nationality"],
+  ["Date of Birth", "dob"],
+  ["Place of Birth", "birthplace"],
+  ["Sex", "sex"],
+  ["Date of Passport Expiry", "passportExpiry"],
+  ["Email Address", "email"],
+  ["Confirm Email Address", "confirmEmail"],
+  ["Country / Region Code", "countryCode"],
+  ["Mobile No.", "mobile"],
+  ["Date of Arrival", "arrival"],
+  ["Date of Departure", "departure"],
+  ["Mode of Travel", "modeTravel"],
+  ["Last Port of Embarkation", "lastPort"],
+  ["Flight / Vessel / Transportation No.", "transportNo"],
+  ["Accommodation of Stay", "accommodation"],
+  ["Address in Malaysia", "address"],
+  ["State", "state"],
+  ["City", "city"],
+  ["Postcode", "postcode"]
+];
 
-const fields = ["name","passport","nationality","dob","passportExpiry","arrival","departure","address"];
+const dateFieldIds = ["dob", "passportExpiry", "arrival", "departure"];
+const storageKey = "canornot_mdac_helper";
 
-const dateFields = ["dob","passportExpiry","arrival","departure"];
+function formatDateInput(value) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
 
-// AUTO DATE FORMAT
-function formatDate(value){
-  let d = value.replace(/\D/g,"").slice(0,8);
-  if(d.length>=5) return d.slice(0,2)+"/"+d.slice(2,4)+"/"+d.slice(4);
-  if(d.length>=3) return d.slice(0,2)+"/"+d.slice(2);
-  return d;
+  if (digits.length >= 5) {
+    return digits.slice(0, 2) + "/" + digits.slice(2, 4) + "/" + digits.slice(4);
+  }
+
+  if (digits.length >= 3) {
+    return digits.slice(0, 2) + "/" + digits.slice(2);
+  }
+
+  return digits;
 }
 
-// SAVE
-function save(){
-  let data={};
-  fields.forEach(id=>{
-    data[id]=document.getElementById(id).value;
+function saveData() {
+  const data = {};
+
+  fields.forEach(([label, id]) => {
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
   });
-  localStorage.setItem("mdac",JSON.stringify(data));
+
+  localStorage.setItem(storageKey, JSON.stringify(data));
+  renderCopyPanel();
 }
 
-// LOAD
-function load(){
-  let d=localStorage.getItem("mdac");
-  if(!d) return;
-  d=JSON.parse(d);
-  fields.forEach(id=>{
-    if(d[id]) document.getElementById(id).value=d[id];
+function loadData() {
+  const saved = localStorage.getItem(storageKey);
+
+  if (!saved) {
+    renderCopyPanel();
+    return;
+  }
+
+  try {
+    const data = JSON.parse(saved);
+
+    fields.forEach(([label, id]) => {
+      const el = document.getElementById(id);
+      if (el && data[id] !== undefined) {
+        el.value = data[id];
+      }
+    });
+  } catch (err) {
+    console.error("Could not load saved MDAC helper data:", err);
+  }
+
+  renderCopyPanel();
+}
+
+function clearData() {
+  if (!confirm("Delete all saved MDAC helper data from this browser?")) return;
+
+  localStorage.removeItem(storageKey);
+
+  fields.forEach(([label, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  renderCopyPanel();
+}
+
+function showSavedData() {
+  const saved = localStorage.getItem(storageKey);
+
+  if (!saved) {
+    alert("No data saved yet.");
+    return;
+  }
+
+  alert(saved);
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  navigator.clipboard.writeText(el.value || "").then(() => {
+    console.log("Copied:", id);
+  }).catch(() => {
+    alert("Copy failed. You can still select and copy manually.");
   });
 }
 
-// DELETE
-function clearData(){
-  if(confirm("Delete all saved data?")){
-    localStorage.removeItem("mdac");
-    fields.forEach(id=>document.getElementById(id).value="");
+function renderCopyPanel() {
+  const panel = document.getElementById("copyPanel");
+  if (!panel) return;
+
+  panel.innerHTML = "";
+
+  fields.forEach(([label, id]) => {
+    const source = document.getElementById(id);
+    const value = source ? source.value : "";
+
+    const wrapper = document.createElement("div");
+
+    wrapper.innerHTML = `
+      <label>${escapeHtml(label)}</label>
+      <div class="copy-row">
+        <input value="${escapeHtml(value)}" readonly>
+        <button type="button" onclick="copyText('${id}')">Copy</button>
+      </div>
+    `;
+
+    panel.appendChild(wrapper);
+  });
+}
+
+function openMDAC() {
+  const url = "https://imigresen-online.imi.gov.my/mdac/main?registerMain";
+  const win = window.open(url, "_blank", "noopener,noreferrer");
+
+  if (!win) {
+    alert("Popup blocked. Please open this manually:\n" + url);
   }
 }
 
-// VIEW
-function showSavedData(){
-  alert(localStorage.getItem("mdac") || "No data saved");
+function fillJBHotel() {
+  document.getElementById("accommodation").value = "Hotel";
+  document.getElementById("address").value = "Holiday Inn Johor Bahru City Centre, Jalan Tun Abdul Razak";
+  document.getElementById("state").value = "Johor";
+  document.getElementById("city").value = "Johor Bahru";
+  document.getElementById("postcode").value = "80000";
+
+  saveData();
 }
 
-// OPEN MDAC
-function openMDAC(){
-  let w=window.open("https://imigresen-online.imi.gov.my/mdac/main?registerMain");
-  if(!w) alert("Popup blocked");
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function(match) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[match];
+  });
 }
 
-// EVENTS
-fields.forEach(id=>{
-  let el=document.getElementById(id);
+dateFieldIds.forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-  el.addEventListener("input",()=>{
-    if(dateFields.includes(id)){
-      el.value=formatDate(el.value);
-    }
-    save();
+  el.addEventListener("input", () => {
+    el.value = formatDateInput(el.value);
+    saveData();
   });
 });
+
+fields.forEach(([label, id]) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.addEventListener("input", () => {
+    saveData();
+  });
+
+  el.addEventListener("change", () => {
+    saveData();
+  });
+});
+
+loadData();
+</script>
+
+</body>
+</html>
