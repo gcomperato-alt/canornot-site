@@ -16,6 +16,9 @@
 
     h1 {
       color: #d35400;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .section {
@@ -57,15 +60,6 @@
       background: #ca6f1e;
     }
 
-    .note {
-      font-size: 0.95rem;
-      color: #333;
-      background: #fff3cd;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 18px;
-    }
-
     .button-row {
       display: flex;
       flex-wrap: wrap;
@@ -73,24 +67,24 @@
       margin-bottom: 18px;
     }
 
-    .copy-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .copy-row input {
-      flex: 1;
-    }
-
-    .copy-row button {
-      width: 90px;
-      margin-top: 5px;
-    }
-
     .small {
       font-size: 0.85rem;
       color: #666;
+    }
+
+    .trust-footer {
+      margin-top: 28px;
+      padding: 16px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #444;
+      background: #fff8df;
+      border: 1px solid #eadcaa;
+      border-radius: 12px;
+    }
+
+    .trust-footer strong {
+      color: #333;
     }
   </style>
 </head>
@@ -98,13 +92,6 @@
 <body>
 
   <h1>🦀 CanOrNot MDAC Helper</h1>
-
-  <p class="note">
-    🔒 <strong>Your data stays on your device.</strong><br>
-    Nothing is uploaded. Nothing is sent to a server. This helper stores your details only in your own browser using localStorage.<br><br>
-    Built by Giuliano Comperato (Singapore).<br>
-    This is a convenience helper. Always check your information carefully on the official MDAC website before submitting.
-  </p>
 
   <div class="button-row">
     <button type="button" onclick="openMDAC()">Open Official MDAC Form</button>
@@ -200,11 +187,14 @@
     </p>
   </div>
 
-  <div class="section">
-    <h2>Copy Panel</h2>
-    <p class="small">Copy each value into the official MDAC form.</p>
-    <div id="copyPanel"></div>
-  </div>
+  <footer class="trust-footer">
+    <strong>Privacy and use note</strong><br>
+    This helper saves your details only in your own browser using localStorage. Nothing is uploaded, transmitted, or stored on a CanOrNot server.
+    Use this tool only on your own device, not on public or shared computers.
+    <br><br>
+    Built by Giuliano Comperato in Singapore as a convenience helper for preparing MDAC form details.
+    Always review your information carefully on the official Malaysia Digital Arrival Card website before submitting.
+  </footer>
 
 <script>
 const fields = [
@@ -257,16 +247,12 @@ function saveData() {
   });
 
   localStorage.setItem(storageKey, JSON.stringify(data));
-  renderCopyPanel();
 }
 
 function loadData() {
   const saved = localStorage.getItem(storageKey);
 
-  if (!saved) {
-    renderCopyPanel();
-    return;
-  }
+  if (!saved) return;
 
   try {
     const data = JSON.parse(saved);
@@ -280,8 +266,6 @@ function loadData() {
   } catch (err) {
     console.error("Could not load saved MDAC helper data:", err);
   }
-
-  renderCopyPanel();
 }
 
 function clearData() {
@@ -293,8 +277,6 @@ function clearData() {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
-
-  renderCopyPanel();
 }
 
 function showSavedData() {
@@ -308,53 +290,15 @@ function showSavedData() {
   alert(saved);
 }
 
-function copyText(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  navigator.clipboard.writeText(el.value || "").then(() => {
-    console.log("Copied:", id);
-  }).catch(() => {
-    alert("Copy failed. You can still select and copy manually.");
-  });
-}
-
-function renderCopyPanel() {
-  const panel = document.getElementById("copyPanel");
-  if (!panel) return;
-
-  panel.innerHTML = "";
-
-  fields.forEach(([label, id]) => {
-    const source = document.getElementById(id);
-    const value = source ? source.value : "";
-
-    const wrapper = document.createElement("div");
-
-    wrapper.innerHTML = `
-      <label>${escapeHtml(label)}</label>
-      <div class="copy-row">
-        <input value="${escapeHtml(value)}" readonly>
-        <button type="button" onclick="copyText('${id}')">Copy</button>
-      </div>
-    `;
-
-    panel.appendChild(wrapper);
-  });
-}
-
 function openMDAC() {
   const url = "https://imigresen-online.imi.gov.my/mdac/main?registerMain";
-
-  // open immediately on click
   const win = window.open("", "_blank");
 
   if (!win) {
-    alert("Popup blocked. Please allow popups.");
+    alert("Popup blocked. Please allow popups or open this manually:\n" + url);
     return;
   }
 
-  // assign AFTER opening (still safe)
   win.location.href = url;
 }
 
@@ -366,18 +310,6 @@ function fillJBHotel() {
   document.getElementById("postcode").value = "80000";
 
   saveData();
-}
-
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, function(match) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[match];
-  });
 }
 
 dateFieldIds.forEach((id) => {
@@ -394,13 +326,8 @@ fields.forEach(([label, id]) => {
   const el = document.getElementById(id);
   if (!el) return;
 
-  el.addEventListener("input", () => {
-    saveData();
-  });
-
-  el.addEventListener("change", () => {
-    saveData();
-  });
+  el.addEventListener("input", saveData);
+  el.addEventListener("change", saveData);
 });
 
 loadData();
