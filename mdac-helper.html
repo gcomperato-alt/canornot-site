@@ -13,9 +13,7 @@
       color: #222;
     }
 
-    h1 {
-      color: #d35400;
-    }
+    h1 { color: #d35400; }
 
     .section {
       background: white;
@@ -52,9 +50,7 @@
       font-weight: bold;
     }
 
-    button:hover {
-      background: #ca6f1e;
-    }
+    button:hover { background: #ca6f1e; }
 
     .copy-row {
       display: flex;
@@ -62,9 +58,7 @@
       align-items: center;
     }
 
-    .copy-row input {
-      flex: 1;
-    }
+    .copy-row input { flex: 1; }
 
     .copy-row button {
       width: 90px;
@@ -80,95 +74,97 @@
     }
   </style>
 </head>
+
 <body>
 
-  <h1>🦀 CanOrNot MDAC Helper</h1>
+<h1>🦀 CanOrNot MDAC Helper</h1>
 
-  <p class="note">
-    Fill this once, then copy each field into the official Malaysia Digital Arrival Card form.
-    Your data is saved only in your browser using localStorage. Do not use this on public computers.
-  </p>
+<p class="note">
+  Fill this once, then copy each field into the official Malaysia Digital Arrival Card form.
+  Your data is saved only in your browser using localStorage. Do not use this on public computers.
+</p>
 
-  <button onclick="openMDAC()">Open Official MDAC Form</button>
-  <button onclick="saveData()">Save</button>
-  <button onclick="clearData()">Clear</button>
+<button onclick="openMDAC()">Open Official MDAC Form</button>
+<button onclick="loadProfile()">Load Saved Profile</button>
+<button onclick="saveData()">Save</button>
+<button onclick="clearData()">Clear</button>
 
-  <div class="section">
-    <h2>Personal Information</h2>
+<div class="section">
+  <h2>Personal Information</h2>
 
-    <label>Name</label>
-    <input id="name" placeholder="GIULIANO COMPERATO">
+  <label>Name</label>
+  <input id="name" placeholder="GIULIANO COMPERATO">
 
-    <label>Passport No.</label>
-    <input id="passport" placeholder="C971WR5LN">
+  <label>Passport No.</label>
+  <input id="passport" placeholder="C971WR5LN">
 
-    <label>Nationality / Citizenship</label>
-    <input id="nationality" placeholder="Germany">
+  <label>Nationality / Citizenship</label>
+  <input id="nationality" placeholder="Germany">
 
-    <label>Date of Birth</label>
-    <input id="dob" placeholder="DD/MM/YYYY">
+  <label>Date of Birth</label>
+  <input id="dob" placeholder="DD/MM/YYYY">
 
-    <label>Place of Birth</label>
-    <input id="birthplace" placeholder="Germany">
+  <label>Place of Birth</label>
+  <input id="birthplace" placeholder="Germany">
 
-    <label>Sex</label>
-    <select id="sex">
-      <option value="">Please choose</option>
-      <option>Male</option>
-      <option>Female</option>
-    </select>
+  <label>Sex</label>
+  <select id="sex">
+    <option value="">Please choose</option>
+    <option>Male</option>
+    <option>Female</option>
+  </select>
 
-    <label>Date of Passport Expiry</label>
-    <input id="passportExpiry" placeholder="DD/MM/YYYY">
+  <label>Date of Passport Expiry</label>
+  <input id="passportExpiry" placeholder="DD/MM/YYYY">
 
-    <label>Email Address</label>
-    <input id="email" type="email">
+  <label>Email Address</label>
+  <input id="email" type="email">
 
-    <label>Country / Region Code</label>
-    <input id="countryCode" placeholder="+65">
+  <label>Country / Region Code</label>
+  <input id="countryCode" placeholder="+65">
 
-    <label>Mobile No.</label>
-    <input id="mobile">
-  </div>
+  <label>Mobile No.</label>
+  <input id="mobile">
+</div>
 
-  <div class="section">
-    <h2>Travel Information</h2>
+<div class="section">
+  <h2>Travel Information</h2>
 
-    <label>Date of Arrival</label>
-    <input id="arrival" placeholder="DD/MM/YYYY">
+  <label>Date of Arrival</label>
+  <input id="arrival" placeholder="DD/MM/YYYY">
 
-    <label>Date of Departure</label>
-    <input id="departure" placeholder="DD/MM/YYYY">
+  <label>Date of Departure</label>
+  <input id="departure" placeholder="DD/MM/YYYY">
 
-    <label>Mode of Travel</label>
-    <input id="modeTravel" placeholder="Air / Land / Sea">
+  <label>Mode of Travel</label>
+  <input id="modeTravel" placeholder="Air / Land / Sea">
 
-    <label>Last Port of Embarkation before Malaysia</label>
-    <input id="lastPort" placeholder="Singapore">
+  <label>Last Port of Embarkation before Malaysia</label>
+  <input id="lastPort" placeholder="Singapore">
 
-    <label>Flight / Vessel / Transportation No.</label>
-    <input id="transportNo">
+  <label>Flight / Vessel / Transportation No.</label>
+  <input id="transportNo">
 
-    <label>Accommodation of Stay</label>
-    <input id="accommodation" placeholder="Hotel / Friend / Others">
+  <label>Accommodation of Stay</label>
+  <input id="accommodation" placeholder="Hotel / Friend / Others">
 
-    <label>Address in Malaysia</label>
-    <textarea id="address" rows="3"></textarea>
+  <label>Address in Malaysia</label>
+  <textarea id="address" rows="3"></textarea>
 
-    <label>State</label>
-    <input id="state" placeholder="Johor / Kuala Lumpur / Penang">
+  <label>State</label>
+  <input id="state" placeholder="Johor / Kuala Lumpur / Penang">
 
-    <label>City</label>
-    <input id="city">
+  <label>City</label>
+  <input id="city">
 
-    <label>Postcode</label>
-    <input id="postcode">
-  </div>
+  <label>Postcode</label>
+  <input id="postcode">
+</div>
 
-  <div class="section">
-    <h2>Copy Panel</h2>
-    <div id="copyPanel"></div>
-  </div>
+<div class="section">
+  <h2>Copy Panel</h2>
+  <div id="copyPanel"></div>
+</div>
 
 <script>
 const fields = [
@@ -196,13 +192,13 @@ const fields = [
 
 function saveData() {
   const data = {};
+
   fields.forEach(([label, id]) => {
     data[id] = document.getElementById(id).value;
   });
 
   localStorage.setItem("canornot_mdac_helper", JSON.stringify(data));
   renderCopyPanel();
-  alert("Saved. Crab remembers locally only 🦀");
 }
 
 function loadData() {
@@ -210,6 +206,7 @@ function loadData() {
   if (!saved) return;
 
   const data = JSON.parse(saved);
+
   fields.forEach(([label, id]) => {
     if (data[id] !== undefined) {
       document.getElementById(id).value = data[id];
@@ -219,10 +216,348 @@ function loadData() {
   renderCopyPanel();
 }
 
+function loadProfile() {
+  const savedProfile = localStorage.getItem("canornot_travel_profile");
+  if (!savedProfile) {
+    alert("No saved travel profile found yet.");
+    return;
+  }
+
+  const profile = JSON.parse(savedProfile);
+
+  document.getElementById("name").value = profile.name || "";
+  document.getElementById("passport").value = profile.passport || "";
+  document.getElementById("nationality").value = profile.nationality || "";
+  document.getElementById("dob").value = profile.dob || "";
+  document.getElementById("birthplace").value = profile.birthplace || "";
+  document.getElementById("sex").value = profile.sex || "";
+  document.getElementById("passportExpiry").value = profile.passportExpiry || "";
+  document.getElementById("email").value = profile.email || "";
+  document.getElementById("countryCode").value = profile.countryCode || "";
+  document.getElementById("mobile").value = profile.mobile || "";
+
+  saveData();
+  renderCopyPanel();
+}
+
 function clearData() {
   if (!confirm("Clear all saved MDAC helper data?")) return;
 
   localStorage.removeItem("canornot_mdac_helper");
+
+  fields.forEach(([label, id]) => {
+    document.getElementById(id).value = "";
+  });
+
+  renderCopyPanel();
+}
+
+function copyText(id) {
+  const value = document.getElementById(id).value;
+  navigator.clipboard.writeText(value);
+}
+
+function renderCopyPanel() {
+  const panel = document.getElementById("copyPanel");
+  panel.innerHTML = "";
+
+  fields.forEach(([label, id]) => {
+    const value = document.getElementById(id).value || "";
+
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = `
+      <label>${label}</label>
+      <div class="copy-row">
+        <input value="${escapeHtml(value)}" readonly>
+        <button onclick="copyText('${id}')">Copy</button>
+      </div>
+    `;
+
+    panel.appendChild(wrapper);
+  });
+}
+
+function openMDAC() {
+  window.open(
+    "https://imigresen-online.imi.gov.my/mdac/main?registerMain",
+    "mdacOfficial",
+    "width=1050,height=850"
+  );
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function(match) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[match];
+  });
+}
+
+fields.forEach(([label, id]) => {
+  document.addEventListener("input", function(e) {
+    if (e.target.id === id) {
+      saveData();
+    }
+  });
+});
+
+loadData();
+loadProfile();
+renderCopyPanel();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CanOrNot MDAC Helper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 760px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fffdf5;
+      color: #222;
+    }
+
+    h1 { color: #d35400; }
+
+    .section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #e67e22;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover { background: #ca6f1e; }
+
+    .copy-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-row input { flex: 1; }
+
+    .copy-row button {
+      width: 90px;
+      margin-top: 5px;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #555;
+      background: #fff3cd;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🦀 CanOrNot MDAC Helper</h1>
+
+<p class="note">
+  Fill this once, then copy each field into the official Malaysia Digital Arrival Card form.
+  Your data is saved only in your browser using localStorage. Do not use this on public computers.
+</p>
+
+<button onclick="openMDAC()">Open Official MDAC Form</button>
+<button onclick="loadProfile()">Load Saved Profile</button>
+<button onclick="saveData()">Save</button>
+<button onclick="clearData()">Clear</button>
+
+<div class="section">
+  <h2>Personal Information</h2>
+
+  <label>Name</label>
+  <input id="name" placeholder="GIULIANO COMPERATO">
+
+  <label>Passport No.</label>
+  <input id="passport" placeholder="C971WR5LN">
+
+  <label>Nationality / Citizenship</label>
+  <input id="nationality" placeholder="Germany">
+
+  <label>Date of Birth</label>
+  <input id="dob" placeholder="DD/MM/YYYY">
+
+  <label>Place of Birth</label>
+  <input id="birthplace" placeholder="Germany">
+
+  <label>Sex</label>
+  <select id="sex">
+    <option value="">Please choose</option>
+    <option>Male</option>
+    <option>Female</option>
+  </select>
+
+  <label>Date of Passport Expiry</label>
+  <input id="passportExpiry" placeholder="DD/MM/YYYY">
+
+  <label>Email Address</label>
+  <input id="email" type="email">
+
+  <label>Country / Region Code</label>
+  <input id="countryCode" placeholder="+65">
+
+  <label>Mobile No.</label>
+  <input id="mobile">
+</div>
+
+<div class="section">
+  <h2>Travel Information</h2>
+
+  <label>Date of Arrival</label>
+  <input id="arrival" placeholder="DD/MM/YYYY">
+
+  <label>Date of Departure</label>
+  <input id="departure" placeholder="DD/MM/YYYY">
+
+  <label>Mode of Travel</label>
+  <input id="modeTravel" placeholder="Air / Land / Sea">
+
+  <label>Last Port of Embarkation before Malaysia</label>
+  <input id="lastPort" placeholder="Singapore">
+
+  <label>Flight / Vessel / Transportation No.</label>
+  <input id="transportNo">
+
+  <label>Accommodation of Stay</label>
+  <input id="accommodation" placeholder="Hotel / Friend / Others">
+
+  <label>Address in Malaysia</label>
+  <textarea id="address" rows="3"></textarea>
+
+  <label>State</label>
+  <input id="state" placeholder="Johor / Kuala Lumpur / Penang">
+
+  <label>City</label>
+  <input id="city">
+
+  <label>Postcode</label>
+  <input id="postcode">
+</div>
+
+<div class="section">
+  <h2>Copy Panel</h2>
+  <div id="copyPanel"></div>
+</div>
+
+<script>
+const fields = [
+  ["Name", "name"],
+  ["Passport No.", "passport"],
+  ["Nationality / Citizenship", "nationality"],
+  ["Date of Birth", "dob"],
+  ["Place of Birth", "birthplace"],
+  ["Sex", "sex"],
+  ["Date of Passport Expiry", "passportExpiry"],
+  ["Email Address", "email"],
+  ["Country / Region Code", "countryCode"],
+  ["Mobile No.", "mobile"],
+  ["Date of Arrival", "arrival"],
+  ["Date of Departure", "departure"],
+  ["Mode of Travel", "modeTravel"],
+  ["Last Port of Embarkation", "lastPort"],
+  ["Flight / Vessel / Transportation No.", "transportNo"],
+  ["Accommodation of Stay", "accommodation"],
+  ["Address in Malaysia", "address"],
+  ["State", "state"],
+  ["City", "city"],
+  ["Postcode", "postcode"]
+];
+
+function saveData() {
+  const data = {};
+
+  fields.forEach(([label, id]) => {
+    data[id] = document.getElementById(id).value;
+  });
+
+  localStorage.setItem("canornot_mdac_helper", JSON.stringify(data));
+  renderCopyPanel();
+}
+
+function loadData() {
+  const saved = localStorage.getItem("canornot_mdac_helper");
+  if (!saved) return;
+
+  const data = JSON.parse(saved);
+
+  fields.forEach(([label, id]) => {
+    if (data[id] !== undefined) {
+      document.getElementById(id).value = data[id];
+    }
+  });
+
+  renderCopyPanel();
+}
+
+function loadProfile() {
+  const savedProfile = localStorage.getItem("canornot_travel_profile");
+  if (!savedProfile) {
+    alert("No saved travel profile found yet.");
+    return;
+  }
+
+  const profile = JSON.parse(savedProfile);
+
+  document.getElementById("name").value = profile.name || "";
+  document.getElementById("passport").value = profile.passport || "";
+  document.getElementById("nationality").value = profile.nationality || "";
+  document.getElementById("dob").value = profile.dob || "";
+  document.getElementById("birthplace").value = profile.birthplace || "";
+  document.getElementById("sex").value = profile.sex || "";
+  document.getElementById("passportExpiry").value = profile.passportExpiry || "";
+  document.getElementById("email").value = profile.email || "";
+  document.getElementById("countryCode").value = profile.countryCode || "";
+  document.getElementById("mobile").value = profile.mobile || "";
+
+  saveData();
+  renderCopyPanel();
+}
+
+function clearData() {
+  if (!confirm("Clear all saved MDAC helper data?")) return;
+
+  localStorage.removeItem("canornot_mdac_helper");
+
   fields.forEach(([label, id]) => {
     document.getElementById(id).value = "";
   });
