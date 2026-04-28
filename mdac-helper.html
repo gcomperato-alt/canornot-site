@@ -209,24 +209,34 @@ function saveData() {
   const data = {};
 
   fields.forEach(([label, id]) => {
-    data[id] = document.getElementById(id).value;
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
   });
 
   localStorage.setItem("canornot_mdac_helper", JSON.stringify(data));
   renderCopyPanel();
+  alert("Saved in this browser.");
 }
 
 function loadData() {
   const saved = localStorage.getItem("canornot_mdac_helper");
-  if (!saved) return;
+  if (!saved) {
+    renderCopyPanel();
+    return;
+  }
 
-  const data = JSON.parse(saved);
+  try {
+    const data = JSON.parse(saved);
 
-  fields.forEach(([label, id]) => {
-    if (data[id] !== undefined) {
-      document.getElementById(id).value = data[id];
-    }
-  });
+    fields.forEach(([label, id]) => {
+      const el = document.getElementById(id);
+      if (el && data[id] !== undefined) {
+        el.value = data[id];
+      }
+    });
+  } catch (err) {
+    console.error("Could not load saved MDAC data:", err);
+  }
 
   renderCopyPanel();
 }
@@ -237,30 +247,36 @@ function clearData() {
   localStorage.removeItem("canornot_mdac_helper");
 
   fields.forEach(([label, id]) => {
-    document.getElementById(id).value = "";
+    const el = document.getElementById(id);
+    if (el) el.value = "";
   });
 
   renderCopyPanel();
 }
 
 function copyText(id) {
-  const value = document.getElementById(id).value;
-  navigator.clipboard.writeText(value);
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  navigator.clipboard.writeText(el.value || "");
 }
 
 function renderCopyPanel() {
   const panel = document.getElementById("copyPanel");
+  if (!panel) return;
+
   panel.innerHTML = "";
 
   fields.forEach(([label, id]) => {
-    const value = document.getElementById(id).value || "";
+    const source = document.getElementById(id);
+    const value = source ? source.value : "";
 
     const wrapper = document.createElement("div");
     wrapper.innerHTML = `
-      <label>${label}</label>
+      <label>${escapeHtml(label)}</label>
       <div class="copy-row">
         <input value="${escapeHtml(value)}" readonly>
-        <button onclick="copyText('${id}')">Copy</button>
+        <button type="button" onclick="copyText('${id}')">Copy</button>
       </div>
     `;
 
@@ -269,13 +285,45 @@ function renderCopyPanel() {
 }
 
 function openMDAC() {
-  window.open(
-    "https://imigresen-online.imi.gov.my/mdac/main?registerMain",
-    "mdacOfficial",
-    "width=1050,height=850"
-  );
+  const url = "https://imigresen-online.imi.gov.my/mdac/main?registerMain";
+  const win = window.open(url, "_blank");
+
+  if (!win) {
+    alert("Popup blocked. Please allow popups or open this manually:\n" + url);
+  }
 }
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, function(match) {
     return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[match];
+  });
+}
+
+dateFieldIds.forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.addEventListener("input", () => {
+    el.value = formatDateInput(el.value);
+    renderCopyPanel();
+  });
+});
+
+fields.forEach(([label, id]) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.addEventListener("input", renderCopyPanel);
+});
+
+loadData();
+</script>
+
+</body>
+</html>
