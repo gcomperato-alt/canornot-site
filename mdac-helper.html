@@ -345,11 +345,17 @@ function renderCopyPanel() {
 
 function openMDAC() {
   const url = "https://imigresen-online.imi.gov.my/mdac/main?registerMain";
-  const win = window.open(url, "_blank", "noopener,noreferrer");
+
+  // open immediately on click
+  const win = window.open("", "_blank");
 
   if (!win) {
-    alert("Popup blocked. Please open this manually:\n" + url);
+    alert("Popup blocked. Please allow popups.");
+    return;
   }
+
+  // assign AFTER opening (still safe)
+  win.location.href = url;
 }
 
 function fillJBHotel() {
