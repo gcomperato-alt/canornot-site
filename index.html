@@ -130,7 +130,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .hero-merlion{display:flex; justify-content:center; align-items:center; width:100%;}
 .hero-merlion img{width:170px; height:auto; image-rendering:pixelated; filter:contrast(.96) brightness(1.02) saturate(.85); opacity:.86;}
 .hero-copy{text-align:center; padding-top:0; width:100%;}
-.hero-copy h1{margin:0; font-size:30px; line-height:1.6; font-weight:normal;}
+.hero-copy h1{margin:0; font-size:30px; line-height:1.6; font-weight:normal; text-shadow:2px 2px 8px rgba(0,0,0,0.95), 0 0 24px rgba(0,0,0,0.85);}
 .hero-copy .red{color:var(--red);}
 .hero-sub{
   margin-top:8px;
@@ -963,6 +963,10 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 }
 .hero-left-panel{
   min-width:0;
+  background:rgba(0,0,0,0.48);
+  padding:22px 28px;
+  border-radius:4px;
+  backdrop-filter:blur(1px);
 }
 .hero-hook-poster{
   border:2px solid var(--line);
