@@ -235,7 +235,7 @@
       }catch(err){
         apiStatus.textContent="API mode: fallback active";
         console.warn("Content Crab API fallback:",err);
-        return localAnswer(q)+"\n\n[Fallback note: the live crab brain is not connected yet, so this is the built-in answer.]";
+        return localAnswer(q);
       }
     }
 
