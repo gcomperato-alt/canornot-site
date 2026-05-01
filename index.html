@@ -130,18 +130,17 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .hero-merlion{display:flex; justify-content:center; align-items:center; width:100%;}
 .hero-merlion img{width:170px; height:auto; image-rendering:pixelated; filter:contrast(.96) brightness(1.02) saturate(.85); opacity:.86;}
 .hero-copy{text-align:center; padding-top:0; width:100%;}
-.hero-copy h1{margin:0; font-size:30px; line-height:1.6; font-weight:normal; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 12px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.9);}
+.hero-copy h1{margin:0; font-size:30px; line-height:1.6; font-weight:normal;}
 .hero-copy .red{color:var(--red);}
 .hero-sub{
   margin-top:8px;
-  color:#4FC3F7;
+  color:var(--muted);
   font-size:16px;
   display:flex;
   align-items:center;
   justify-content:center;
   gap:8px;
   flex-wrap:wrap;
-  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 0 0 10px rgba(0,0,0,1);
 }
 .cothink-crab-btn{
   width:28px;
@@ -190,15 +189,13 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   margin-top:6px;
   font-size:19px;
   line-height:1.1;
-  color:#ffffff;
+  color:#25252b;
   text-align:center;
-  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 10px rgba(0,0,0,1);
 }
 .crab-identity-line strong{
   font-family:'Press Start 2P', monospace;
   font-size:10px;
-  color:#fff6a5;
-  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 0 0 8px rgba(0,0,0,1);
+  color:#111;
 }
 @media (max-width: 860px){
   .crab-identity-line{
@@ -338,8 +335,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 .footer-grid{display:grid; grid-template-columns:1fr 1fr 1fr 1.25fr; position:relative; z-index:1;}
 .footer-item{padding:12px 14px 12px 16px; min-height:84px; border-right:2px solid #c7c6cf;}
 .footer-item:last-child{border-right:0; padding-right:250px;}
-.footer-head{display:flex; align-items:flex-start; gap:10px; font-size:11px; line-height:1.45; margin-bottom:6px;}
-.footer-copy{padding-left:34px; font-size:18px; line-height:1.14; font-family:'VT323', monospace; color:#25252b; max-width:220px;}
+.footer-head{display:flex; align-items:flex-start; gap:10px; font-size:11px; line-height:1.45; margin-bottom:6px; color:#006400; text-shadow:1px 1px 0 rgba(0,0,0,0.5);}
+.footer-copy{padding-left:34px; font-size:18px; line-height:1.14; font-family:'VT323', monospace; color:#006400; max-width:220px; text-shadow:1px 1px 0 rgba(0,0,0,0.5);}
 .skyline{position:absolute; right:8px; bottom:0; width:230px; height:auto; image-rendering:pixelated; z-index:0;}
 
 .sg-toast{
@@ -1139,8 +1136,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 
 <div class="hero-copy">
 <h1 class="pixel hero-title-stack" id="heroTitle">
-<span>Can or Not</span>
-<span>Better <span class="red">Input</span> and Singlish?</span>
+<span style="color:#8B0000; text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 12px rgba(0,0,0,1);">Can or Not</span>
+<span id="heroTitleAction" style="color:#00008B; text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 12px rgba(0,0,0,1);">Better <span class="red">Input</span> and Singlish?</span>
 </h1>
 <div class="hero-sub pixel">
   <span>CoThink</span>
@@ -2829,8 +2826,10 @@ function updateHeroTitleForVisit() {
   const hasMemory = Boolean(getStoredStickySnapshot()) || Boolean((localStorage.getItem(CURRENT_INPUT_KEY) || '').trim());
   if (hasMemory && visits >= 2) {
     action.innerHTML = 'Better <span class="red">Input</span> and Singlish?';
+    action.style.color = '#00008B';
   } else {
     action.innerHTML = 'Better <span class="red">Input</span> and Singlish?';
+    action.style.color = '#00008B';
   }
 }
 
