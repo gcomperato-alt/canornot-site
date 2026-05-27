@@ -3455,7 +3455,14 @@ if (!hasAnyLocalMemory) {
 
 
 
-function canOrNotShowPage(page) {
+const CANORNOT_SIGNAL_HASHES = new Set([
+  '#signals',
+  '#choose-signal',
+  '#featured-transmission',
+  '#signal-archive'
+]);
+
+function canOrNotShowPage(page, options = {}) {
   const home = document.getElementById('homePageContent');
   const signals = document.getElementById('signalsPage');
   const returned = document.getElementById('returnedAnswer');
@@ -3466,13 +3473,33 @@ function canOrNotShowPage(page) {
   if (returned) returned.style.display = showSignals ? 'none' : '';
   const title = document.querySelector('.titleleft div:last-child');
   if (title) title.textContent = showSignals ? 'CAN OR NOT - SIGNAL MODE' : 'CAN OR NOT - AI FOR LOCALS';
-  if (showSignals) window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (showSignals && !options.preserveScroll) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
+
+function canOrNotScrollToSignalsHash() {
+  const hash = (window.location.hash || '').toLowerCase();
+  if (!hash || hash === '#signals') return;
+  const target = document.querySelector(hash);
+  if (target && target.closest('#signalsPage')) {
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  }
+}
+
 function canOrNotRouteFromLocation() {
   const path = (window.location.pathname || '').toLowerCase();
   const hash = (window.location.hash || '').toLowerCase();
-  const wantsSignals = hash === '#signals' || path.endsWith('/signals') || path.endsWith('/signals/');
-  canOrNotShowPage(wantsSignals ? 'signals' : 'home');
+  const wantsSignals =
+    CANORNOT_SIGNAL_HASHES.has(hash) ||
+    path.endsWith('/signals') ||
+    path.endsWith('/signals/');
+  canOrNotShowPage(wantsSignals ? 'signals' : 'home', {
+    preserveScroll: wantsSignals && hash !== '#signals'
+  });
+  if (wantsSignals) canOrNotScrollToSignalsHash();
 }
 window.addEventListener('hashchange', canOrNotRouteFromLocation);
 document.addEventListener('click', (event) => {
