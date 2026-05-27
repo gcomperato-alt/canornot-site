@@ -1063,6 +1063,331 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
     align-items:flex-start;
   }
 }
+
+
+/* Signals from the Void landing page */
+.navitem-link{
+  text-decoration:none;
+  cursor:pointer;
+}
+.navitem.signal-link span{
+  color:#ffdf74;
+  text-shadow:1px 1px 3px rgba(0,0,0,1), 0 0 10px rgba(220,47,47,.9);
+}
+.navitem.signal-link{
+  animation:signalFlicker 2.8s steps(1) infinite;
+}
+@keyframes signalFlicker{
+  0%,88%,100%{filter:none;}
+  89%{filter:brightness(1.4) contrast(1.25); transform:translateX(1px);}
+  90%{filter:brightness(.8); transform:translateX(-1px);}
+  91%{filter:none; transform:none;}
+}
+.poster-signal-link{
+  display:block;
+  color:inherit;
+  text-decoration:none;
+}
+.poster-signal-link .poster-caption{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.poster-signal-link .poster-caption strong{
+  color:#dc2f2f;
+}
+.poster-signal-link:hover .hero-hook-poster,
+.hero-hook-poster:hover{
+  filter:brightness(1.08) contrast(1.05);
+}
+.page-hidden{display:none !important;}
+.signals-page{
+  max-width:1180px;
+  margin:0 auto 32px;
+  padding:10px 0 30px;
+}
+.signals-hero{
+  display:grid;
+  grid-template-columns:minmax(320px, 1.05fr) minmax(320px, .95fr);
+  gap:26px;
+  align-items:center;
+  margin:14px auto 22px;
+}
+.signals-panel{
+  border:2px solid var(--line);
+  background:rgba(42,31,16,.92);
+  box-shadow:6px 6px 0 rgba(0,0,0,.24), inset 1px 1px 0 rgba(255,255,255,.16);
+  color:#F5F5DC;
+}
+.signals-window-head{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 10px;
+  background:linear-gradient(90deg,#111136,var(--purple1) 58%,#7d1212);
+  border-bottom:2px solid var(--line);
+  color:var(--yellow);
+  font-size:10px;
+}
+.signals-hero-copy{
+  padding:28px 28px 26px;
+}
+.signals-kicker{
+  display:inline-block;
+  padding:7px 10px;
+  border:2px solid var(--line);
+  background:#fff7df;
+  color:#111;
+  font-size:9px;
+  margin-bottom:16px;
+}
+.signals-title{
+  margin:0;
+  font-size:34px;
+  line-height:1.35;
+  color:#FFF4A8;
+  font-weight:normal;
+  text-shadow:2px 2px 0 #111, 0 0 18px rgba(220,47,47,.55);
+}
+.signals-subtitle{
+  margin:16px 0 0;
+  font-size:26px;
+  line-height:1.12;
+  color:#F5F5DC;
+}
+.signals-intro{
+  margin:16px 0 0;
+  font-size:23px;
+  line-height:1.14;
+  color:#fff1c9;
+}
+.signals-actions{
+  margin-top:20px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.signals-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:11px 14px;
+  border:2px solid var(--line);
+  background:linear-gradient(#fff7df,#e8d99e);
+  color:#111;
+  text-decoration:none;
+  font-size:10px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.28);
+}
+.signals-btn.secondary{
+  background:linear-gradient(#f6f5f9,#d8d7df);
+}
+.signals-btn:hover{transform:translateY(-1px);}
+.signals-note{
+  margin-top:14px;
+  font-size:18px;
+  line-height:1.1;
+  color:#AEEFFF;
+}
+.transmission-card{
+  overflow:hidden;
+}
+.transmission-card img{
+  width:100%;
+  display:block;
+  background:#111;
+}
+.transmission-caption{
+  padding:12px 14px;
+  border-top:2px solid var(--line);
+  background:#fff7df;
+  color:#111;
+  text-align:center;
+  font-size:10px;
+  line-height:1.5;
+}
+.transmission-caption strong{color:#dc2f2f;}
+.signals-section{
+  margin:24px auto 0;
+}
+.signals-section-title{
+  display:inline-block;
+  padding:9px 12px;
+  border:2px solid var(--line);
+  background:linear-gradient(90deg,var(--purple1),var(--purple2));
+  color:var(--yellow);
+  font-size:10px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.2);
+}
+.signal-door-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-top:14px;
+}
+.signal-door,
+.archive-card,
+.signal-copy-card{
+  border:2px solid var(--line);
+  background:#f6f5f9;
+  box-shadow:4px 4px 0 rgba(0,0,0,.2);
+  padding:16px;
+}
+.signal-door h3,
+.archive-card h3{
+  margin:0 0 10px;
+  font-size:13px;
+  line-height:1.45;
+  color:#111;
+  font-weight:normal;
+}
+.signal-door p,
+.archive-card p,
+.signal-copy-card p{
+  margin:0;
+  font-size:22px;
+  line-height:1.12;
+  color:#25252b;
+}
+.signal-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:14px 0;
+}
+.signal-tag{
+  padding:5px 7px;
+  border:2px solid var(--line);
+  background:#fff7df;
+  color:#111;
+  font-size:8px;
+}
+.signal-mini-link{
+  display:inline-flex;
+  margin-top:2px;
+  color:#2f43c7;
+  font-size:9px;
+  text-decoration:none;
+}
+.featured-transmission{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:18px;
+  align-items:stretch;
+  margin-top:14px;
+}
+.video-placeholder{
+  min-height:310px;
+  display:grid;
+  place-items:center;
+  border:2px solid var(--line);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,244,168,.14), transparent 34%),
+    linear-gradient(135deg,#111,#24170f 48%,#070711);
+  color:#FFF4A8;
+  text-align:center;
+  padding:22px;
+}
+.video-placeholder strong{
+  display:block;
+  font-size:18px;
+  line-height:1.5;
+  margin-bottom:10px;
+}
+.video-placeholder span{
+  display:block;
+  font-family:'VT323', monospace;
+  font-size:24px;
+  line-height:1.1;
+  color:#F5F5DC;
+}
+.feature-copy{
+  padding:18px;
+}
+.feature-copy h3{
+  margin:0 0 10px;
+  font-size:13px;
+  line-height:1.5;
+  color:#FFF4A8;
+  font-weight:normal;
+}
+.feature-copy p{
+  margin:0 0 14px;
+  font-size:23px;
+  line-height:1.12;
+  color:#F5F5DC;
+}
+.archive-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:14px;
+}
+.archive-type{
+  display:inline-block;
+  margin-bottom:10px;
+  padding:5px 7px;
+  border:2px solid var(--line);
+  background:#fff7df;
+  color:#111;
+  font-size:8px;
+}
+.signal-two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-top:14px;
+}
+.signal-copy-card h3{
+  margin:0 0 10px;
+  font-size:13px;
+  line-height:1.45;
+  font-weight:normal;
+}
+.signal-footer{
+  margin-top:24px;
+  text-align:center;
+  padding:20px;
+  border:2px solid var(--line);
+  background:rgba(255,247,223,.92);
+  box-shadow:4px 4px 0 rgba(0,0,0,.2);
+}
+.signal-footer h2{
+  margin:0 0 10px;
+  font-size:17px;
+  line-height:1.45;
+  font-weight:normal;
+}
+.signal-footer p{
+  margin:0 auto 16px;
+  max-width:740px;
+  font-size:23px;
+  line-height:1.12;
+}
+@media (max-width: 1000px){
+  .signals-hero,
+  .featured-transmission,
+  .signal-two-col{
+    grid-template-columns:1fr;
+  }
+  .signal-door-grid,
+  .archive-grid{
+    grid-template-columns:1fr;
+  }
+  .signals-title{font-size:27px;}
+  .signals-subtitle{font-size:23px;}
+}
+@media (max-width: 860px){
+  .signals-page{padding:4px 0 24px;}
+  .signals-hero-copy{padding:20px 18px;}
+  .signals-title{font-size:22px;}
+  .signals-subtitle,.signals-intro{font-size:21px;}
+  .video-placeholder{min-height:230px;}
+}
+
 </style>
 </head>
 <body>
@@ -1114,6 +1439,11 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
     </div>
   </div>
 
+
+  <a class="navitem navitem-link signal-link" href="#signals" aria-label="Open Signals from the Void">
+    <svg height="22" viewBox="0 0 22 22" width="22"><path d="M11 2c3.2 3.2 3.2 14.8 0 18C7.8 16.8 7.8 5.2 11 2z" fill="#111" stroke="#ffdf74" stroke-width="1.4"></path><path d="M5 11h12M7 7l8 8M15 7l-8 8" stroke="#dc2f2f" stroke-width="1.4"></path></svg><span>SIGNALS</span>
+  </a>
+
   <div class="nav-dropdown">
     <div class="navitem">
       <svg height="22" viewBox="0 0 18 22" width="18"><path d="M3 1h9l3 3v17H3z" fill="#ececf5" stroke="#222" stroke-width="1.5"></path><path d="M12 1v4h4" fill="none" stroke="#222" stroke-width="1.5"></path><path d="M6 10h6M6 14h6" stroke="#777" stroke-width="1.4"></path></svg><span>BLOG</span>
@@ -1136,6 +1466,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 </button>
 </div>
 <main class="main">
+<div id="homePageContent">
 <section class="hero">
 <div class="hero-intro-layout">
 <div class="hero-left-panel">
@@ -1154,10 +1485,12 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <div class="crab-identity-line terminal"><strong>🦀 This one not normal AI.</strong><br/>I remember how you think.</div>
 </div>
 </div>
-<aside class="hero-hook-poster" aria-label="CanOrNot, the site that replies">
-  <img src="public/canornot-replies.png" alt="CanOrNot - the site that replies">
-  <div class="poster-caption pixel">TRY IT. IT REPLIES.</div>
+<a class="poster-signal-link" href="#signals" aria-label="Enter Signals from the Void">
+<aside class="hero-hook-poster" aria-label="Signals from the Void cave portal">
+  <img src="public/canornot-replies.png" alt="CanOrNot cave portal - The cave didn't echo. It replied.">
+  <div class="poster-caption pixel"><span>THE CAVE DIDN'T ECHO. IT REPLIED.</span><strong>ENTER SIGNALS FROM THE VOID</strong></div>
 </aside>
+</a>
 </div>
 </section>
 <section class="main-chat-window">
@@ -1290,6 +1623,112 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 <div class="footer-item"><div class="footer-head pixel"><span style="font-size:18px">💗</span><span>USE AI WISELY</span></div><div class="footer-copy terminal">Better communication, better outcomes</div></div>
 </div>
 </footer>
+
+</div>
+
+<section id="signalsPage" class="signals-page page-hidden" aria-label="Signals from the Void landing page">
+  <div class="signals-hero">
+    <div class="signals-panel">
+      <div class="signals-window-head pixel"><span>★ SIGNALS FROM THE VOID</span><span>VOID MODE: ON ▼</span></div>
+      <div class="signals-hero-copy">
+        <div class="signals-kicker pixel">TRANSMISSION DETECTED</div>
+        <h1 class="signals-title pixel">SIGNALS FROM THE VOID</h1>
+        <p class="signals-subtitle terminal">Philosophical horror, strange games, deep narration, and AI-assisted storytelling.</p>
+        <p class="signals-intro terminal">You found a signal. It may be a story, a broken game, a cave echo, a strange voice, or something replying from inside the interface.</p>
+        <div class="signals-actions">
+          <a class="signals-btn pixel" href="#featured-transmission">WATCH THE SIGNAL</a>
+          <a class="signals-btn secondary pixel" href="#signal-archive">ENTER THE ARCHIVE</a>
+          <a class="signals-btn secondary pixel" href="#home" data-open-home>BACK TO CANORNOT</a>
+        </div>
+        <div class="signals-note terminal">Best experienced with headphones and questionable certainty.</div>
+      </div>
+    </div>
+    <aside class="signals-panel transmission-card">
+      <div class="signals-window-head pixel"><span>★ CAVE PORTAL</span><span>NO ECHO FOUND</span></div>
+      <img src="public/canornot-replies.png" alt="The cave didn't echo. It replied.">
+      <div class="transmission-caption pixel">THE CAVE DIDN'T ECHO.<br/><strong>IT REPLIED.</strong></div>
+    </aside>
+  </div>
+
+  <section class="signals-section" id="choose-signal">
+    <div class="signals-section-title pixel">CHOOSE YOUR SIGNAL</div>
+    <div class="signal-door-grid">
+      <article class="signal-door">
+        <h3 class="pixel">STORIES FROM THE VOID</h3>
+        <p class="terminal">Original horror and philosophical fiction narrated in a deep cinematic voice. Strange rooms, impossible events, broken perception, and the feeling that meaning is staring back.</p>
+        <div class="signal-tags"><span class="signal-tag pixel">ILLUMINATION</span><span class="signal-tag pixel">NO... MOMENTUM</span><span class="signal-tag pixel">HORROR</span></div>
+        <a class="signal-mini-link pixel" href="#signal-archive">LISTEN TO STORIES →</a>
+      </article>
+      <article class="signal-door">
+        <h3 class="pixel">VOID GAMEPLAY</h3>
+        <p class="terminal">Horror games, obscure worlds, cinematic suffering, absurd bugs, puzzle rage, and commentary from the edge of sanity.</p>
+        <div class="signal-tags"><span class="signal-tag pixel">ECLIPSIUM</span><span class="signal-tag pixel">AMENTI</span><span class="signal-tag pixel">MR. COO</span><span class="signal-tag pixel">NIGHT DELIVERY</span></div>
+        <a class="signal-mini-link pixel" href="#signal-archive">WATCH GAMEPLAY →</a>
+      </article>
+      <article class="signal-door">
+        <h3 class="pixel">DECODE THE SIGNAL</h3>
+        <p class="terminal">AI, ADS, intent layers, interaction design, and the hidden structure behind prompts, stories, interfaces, and decisions.</p>
+        <div class="signal-tags"><span class="signal-tag pixel">ADS</span><span class="signal-tag pixel">COTHINK</span><span class="signal-tag pixel">CANORNOT</span></div>
+        <a class="signal-mini-link pixel" href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">OPEN COTHINK →</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="signals-section" id="featured-transmission">
+    <div class="signals-section-title pixel">FEATURED TRANSMISSION</div>
+    <div class="featured-transmission">
+      <div class="video-placeholder">
+        <div><strong class="pixel">YOUTUBE EMBED GOES HERE</strong><span>Start with the video that says: this is not normal internet noise.</span></div>
+      </div>
+      <div class="signals-panel feature-copy">
+        <h3 class="pixel">RECOMMENDED ENTRY POINT</h3>
+        <p class="terminal">This is where horror, game logic, voice, and strange commentary begin to merge into one signal.</p>
+        <p class="terminal">Replace the placeholder with your strongest YouTube embed. For now this section is ready as the landing pad.</p>
+        <div class="signals-actions">
+          <a class="signals-btn pixel" href="https://www.youtube.com/results?search_query=Signals+from+the+Void+Giuliano+Comperato" target="_blank" rel="noopener">WATCH ON YOUTUBE</a>
+          <a class="signals-btn secondary pixel" href="https://www.youtube.com/results?search_query=Giuliano+Comperato+Signals+from+the+Void" target="_blank" rel="noopener">FIND THE CHANNEL</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="signals-section" id="signal-archive">
+    <div class="signals-section-title pixel">THE ARCHIVE</div>
+    <div class="archive-grid">
+      <article class="archive-card"><span class="archive-type pixel">STORY</span><h3 class="pixel">ILLUMINATION</h3><p class="terminal">Plato's cave, but the shadow learned your name.</p></article>
+      <article class="archive-card"><span class="archive-type pixel">SERIAL HORROR</span><h3 class="pixel">NO... MOMENTUM</h3><p class="terminal">A tiny impossible event expands until the world refuses to move correctly.</p></article>
+      <article class="archive-card"><span class="archive-type pixel">SHORT</span><h3 class="pixel">FLY LITTLE CHILD</h3><p class="terminal">A game bug becomes accidental opera.</p></article>
+      <article class="archive-card"><span class="archive-type pixel">GAMEPLAY</span><h3 class="pixel">AMENTI</h3><p class="terminal">Egyptian horror, cursed spaces, and a man negotiating with bad decisions.</p></article>
+      <article class="archive-card"><span class="archive-type pixel">GAMEPLAY</span><h3 class="pixel">ECLIPSIUM</h3><p class="terminal">Mirrors, mazes, hallucinations, and commentary drifting into ritual logic.</p></article>
+      <article class="archive-card"><span class="archive-type pixel">AI / ADS</span><h3 class="pixel">DECODE THE SIGNAL</h3><p class="terminal">Prompting, interaction design, and meaning as a live process instead of dead output.</p></article>
+    </div>
+  </section>
+
+  <section class="signals-section">
+    <div class="signals-section-title pixel">WHO IS SENDING THIS?</div>
+    <div class="signal-two-col">
+      <article class="signal-copy-card">
+        <h3 class="pixel">THE VOICE</h3>
+        <p class="terminal">I am Giuliano Comperato: storyteller, former lecturer, AI interaction designer, and philosophical gamer based in Singapore. Signals from the Void is where horror stories, gameplay, voice experiments, AI tools, and meaning systems collide.</p>
+      </article>
+      <article class="signal-copy-card">
+        <h3 class="pixel">WHY INSIDE CANORNOT?</h3>
+        <p class="terminal">CanOrNot asks whether your input works. Signals from the Void asks what answers back. One is the tool. The other is the chamber behind the tool.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="signal-footer">
+    <h2 class="pixel">FOLLOW THE SIGNAL</h2>
+    <p class="terminal">New transmissions appear on YouTube. Some are stories. Some are games. Some should probably not have escaped the cave.</p>
+    <div class="signals-actions" style="justify-content:center;">
+      <a class="signals-btn pixel" href="https://www.youtube.com/results?search_query=Signals+from+the+Void+Giuliano+Comperato" target="_blank" rel="noopener">YOUTUBE</a>
+      <a class="signals-btn secondary pixel" href="https://www.linkedin.com/search/results/all/?keywords=Giuliano%20Comperato" target="_blank" rel="noopener">LINKEDIN</a>
+      <a class="signals-btn secondary pixel" href="#home" data-open-home>CANORNOT HOME</a>
+    </div>
+  </section>
+</section>
+
 </main>
 
 <div id="returnedAnswer" style="
@@ -2961,6 +3400,38 @@ if (!hasAnyLocalMemory) {
   script.src = "/_vercel/insights/script.js";
   document.head.appendChild(script);
 })();
+
+
+
+function canOrNotShowPage(page) {
+  const home = document.getElementById('homePageContent');
+  const signals = document.getElementById('signalsPage');
+  const returned = document.getElementById('returnedAnswer');
+  if (!home || !signals) return;
+  const showSignals = page === 'signals';
+  home.classList.toggle('page-hidden', showSignals);
+  signals.classList.toggle('page-hidden', !showSignals);
+  if (returned) returned.style.display = showSignals ? 'none' : '';
+  const title = document.querySelector('.titleleft div:last-child');
+  if (title) title.textContent = showSignals ? 'CAN OR NOT - SIGNAL MODE' : 'CAN OR NOT - AI FOR LOCALS';
+  if (showSignals) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function canOrNotRouteFromLocation() {
+  const path = (window.location.pathname || '').toLowerCase();
+  const hash = (window.location.hash || '').toLowerCase();
+  const wantsSignals = hash === '#signals' || path.endsWith('/signals') || path.endsWith('/signals/');
+  canOrNotShowPage(wantsSignals ? 'signals' : 'home');
+}
+window.addEventListener('hashchange', canOrNotRouteFromLocation);
+document.addEventListener('click', (event) => {
+  const openHome = event.target.closest('[data-open-home]');
+  if (openHome) {
+    event.preventDefault();
+    history.pushState(null, '', '#home');
+    canOrNotShowPage('home');
+  }
+});
+window.addEventListener('load', canOrNotRouteFromLocation);
 
 // Final observer-state correction: on a clean box, crab waits. It does not perform random comments.
 window.addEventListener('load', () => {
