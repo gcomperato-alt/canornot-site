@@ -1401,6 +1401,25 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .video-placeholder{min-height:260px;}
 }
 
+
+/* Featured Transmission responsive layout */
+.featured-transmission {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1000px) {
+  .featured-transmission {
+    grid-template-columns: 1fr;
+  }
+  
+  .video-placeholder iframe {
+    height: 260px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1639,117 +1658,127 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 
 </div>
 
-<section id="signalsPage" class="signals-page page-hidden" aria-label="Signals from the Void landing page">
+<section id="signalsPage" class="signals-page page-hidden">
+
+  <!-- HERO -->
   <div class="signals-hero">
     <div class="signals-panel">
-      <div class="signals-window-head pixel"><span>★ SIGNALS FROM THE VOID</span><span>VOID MODE: ON ▼</span></div>
+      <div class="signals-window-head pixel">
+        <span>★ SIGNALS FROM THE VOID</span>
+      </div>
       <div class="signals-hero-copy">
         <div class="signals-kicker pixel">TRANSMISSION DETECTED</div>
         <h1 class="signals-title pixel">SIGNALS FROM THE VOID</h1>
         <p class="signals-subtitle terminal">Philosophical horror, strange games, deep narration, and AI-assisted storytelling.</p>
         <p class="signals-intro terminal">You found a signal. It may be a story, a broken game, a cave echo, a strange voice, or something replying from inside the interface.</p>
+        
         <div class="signals-actions">
-          <a class="signals-btn pixel" href="#featured-transmission">WATCH THE SIGNAL</a>
-          <a class="signals-btn secondary pixel" href="#signal-archive">ENTER THE ARCHIVE</a>
-          <a class="signals-btn secondary pixel" href="#home" data-open-home>BACK TO CANORNOT</a>
+          <a href="#featured-transmission" class="signals-btn pixel">WATCH THE SIGNAL</a>
+          <a href="#signal-archive" class="signals-btn secondary pixel">ENTER THE ARCHIVE</a>
+          <a href="#" class="signals-btn secondary pixel" data-open-home>BACK TO CANORNOT</a>
         </div>
+        
         <div class="signals-note terminal">Best experienced with headphones and questionable certainty.</div>
       </div>
     </div>
-    <aside class="signals-panel transmission-card">
-      <div class="signals-window-head pixel"><span>★ CAVE PORTAL</span><span>NO ECHO FOUND</span></div>
-      <img src="public/canornot-replies.png" alt="The cave didn't echo. It replied.">
-      <div class="transmission-caption pixel">THE CAVE DIDN'T ECHO.<br/><strong>IT REPLIED.</strong></div>
-    </aside>
+
+    <!-- Cave Portal -->
+    <div class="signals-panel transmission-card">
+      <div class="signals-window-head pixel">
+        <span>★ CAVE PORTAL</span>
+      </div>
+      <img src="public/canornot-replies.png" alt="The cave didn't echo. It replied." style="width:100%; display:block;">
+      <div class="transmission-caption pixel">
+        THE CAVE DIDN'T ECHO.<br>
+        <strong style="color:#ff3366;">IT REPLIED.</strong>
+      </div>
+    </div>
   </div>
 
-  <section class="signals-section" id="choose-signal">
+  <!-- CHOOSE YOUR SIGNAL -->
+  <div class="signals-section" id="choose-signal">
     <div class="signals-section-title pixel">CHOOSE YOUR SIGNAL</div>
     <div class="signal-door-grid">
-      <article class="signal-door">
+
+      <!-- Stories -->
+      <div class="signal-door">
         <h3 class="pixel">STORIES FROM THE VOID</h3>
         <p class="terminal">Original horror and philosophical fiction narrated in a deep cinematic voice. Strange rooms, impossible events, broken perception, and the feeling that meaning is staring back.</p>
-        <div class="signal-tags"><span class="signal-tag pixel">ILLUMINATION</span><span class="signal-tag pixel">NO... MOMENTUM</span><span class="signal-tag pixel">HORROR</span></div>
-        <a class="signal-mini-link pixel" href="#signal-archive">LISTEN TO STORIES →</a>
-      </article>
-      <article class="signal-door">
+        <div class="signal-tags">
+          <span class="signal-tag pixel">ILLUMINATION</span>
+          <span class="signal-tag pixel">NO... MOMENTUM</span>
+          <span class="signal-tag pixel">HORROR</span>
+        </div>
+        <a href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener" class="signal-mini-link pixel">LISTEN TO STORIES →</a>
+      </div>
+
+      <!-- Void Gameplay -->
+      <div class="signal-door">
         <h3 class="pixel">VOID GAMEPLAY</h3>
         <p class="terminal">Horror games, obscure worlds, cinematic suffering, absurd bugs, puzzle rage, and commentary from the edge of sanity.</p>
-        <div class="signal-tags"><span class="signal-tag pixel">ECLIPSIUM</span><span class="signal-tag pixel">AMENTI</span><span class="signal-tag pixel">MR. COO</span><span class="signal-tag pixel">NIGHT DELIVERY</span></div>
-        <a class="signal-mini-link pixel" href="#signal-archive">WATCH GAMEPLAY →</a>
-      </article>
-      <article class="signal-door">
+        <div class="signal-tags">
+          <span class="signal-tag pixel">ECLIPSIUM</span>
+          <span class="signal-tag pixel">AMENTI</span>
+          <span class="signal-tag pixel">MR. COO</span>
+          <span class="signal-tag pixel">NIGHT DELIVERY</span>
+        </div>
+        <a href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener" class="signal-mini-link pixel">WATCH GAMEPLAY →</a>
+      </div>
+
+      <!-- Decode -->
+      <div class="signal-door">
         <h3 class="pixel">DECODE THE SIGNAL</h3>
         <p class="terminal">AI, ADS, intent layers, interaction design, and the hidden structure behind prompts, stories, interfaces, and decisions.</p>
-        <div class="signal-tags"><span class="signal-tag pixel">ADS</span><span class="signal-tag pixel">COTHINK</span><span class="signal-tag pixel">CANORNOT</span></div>
-        <a class="signal-mini-link pixel" href="https://co-think-sage.vercel.app" target="_blank" rel="noopener">OPEN COTHINK →</a>
-      </article>
-    </div>
-  </section>
+        <div class="signal-tags">
+          <span class="signal-tag pixel">ADS</span>
+          <span class="signal-tag pixel">COTHINK</span>
+          <span class="signal-tag pixel">CANORNOT</span>
+        </div>
+        <a href="https://co-think-sage.vercel.app" target="_blank" rel="noopener" class="signal-mini-link pixel">OPEN COTHINK →</a>
+      </div>
 
-  <section class="signals-section" id="featured-transmission">
+    </div>
+  </div>
+
+  <!-- FEATURED TRANSMISSION -->
+  <div class="signals-section" id="featured-transmission">
     <div class="signals-section-title pixel">FEATURED TRANSMISSION</div>
+    
     <div class="featured-transmission">
-      <div class="video-placeholder">
-        <iframe
-          id="amentiEmbed"
-          width="100%"
-          height="310"
-          src="https://www.youtube.com/embed/vb2-x7I_6Zk?start=1543"
-          title="AMENTI Walkthrough - Signals from the Void"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      <!-- Amenti Embed -->
+      <div class="video-placeholder" style="background:#0a0a0a; border:2px solid #662222; overflow:hidden; padding:0; position:relative;">
+        <iframe 
+          width="100%" 
+          height="315" 
+          src="https://www.youtube.com/embed/vb2-x7I_6Zk?start=1543" 
+          title="AMENTI Walkthrough" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen>
         </iframe>
       </div>
-      <div class="signals-panel feature-copy">
-        <h3 class="pixel">FEATURED TRANSMISSION</h3>
-        <p class="terminal"><strong>AMENTI</strong><br>Deep dive into one of the strangest signals yet.</p>
-        <div class="signals-actions" style="margin-top:24px; display:flex; flex-wrap:wrap; gap:12px;">
-          <a class="signals-btn pixel" href="https://www.youtube.com/watch?v=vb2-x7I_6Zk" target="_blank" rel="noopener" style="background:#3a0f0f; color:#ffdd88;">▶ WATCH FULL WALKTHROUGH</a>
-          <a class="signals-btn secondary pixel" href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener">LISTEN TO STORIES</a>
-          <a class="signals-btn secondary pixel" href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener">WATCH GAMEPLAY</a>
+
+      <div class="feature-copy" style="background:rgba(30,10,10,0.95); padding:24px; border:2px solid #662222;">
+        <h3 style="color:#ffcc77; margin-top:0;">AMENTI</h3>
+        <p style="color:#f5d5aa; font-size:22px; line-height:1.2;">
+          Deep walkthrough of one of the most unsettling signals received so far.
+        </p>
+        <div style="margin-top:20px;">
+          <a href="https://www.youtube.com/watch?v=vb2-x7I_6Zk" target="_blank" rel="noopener" class="signals-btn pixel">▶ WATCH FULL WALKTHROUGH</a>
         </div>
-        <small class="terminal" style="color:#aa9988; display:block; margin-top:16px; font-size:18px; line-height:1.1;">Signal Type: Narrative Horror • Length: Long-form</small>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="signals-section" id="signal-archive">
+  <!-- ARCHIVE -->
+  <div class="signals-section" id="signal-archive">
     <div class="signals-section-title pixel">THE ARCHIVE</div>
-    <div class="archive-grid">
-      <article class="archive-card"><span class="archive-type pixel">STORY</span><h3 class="pixel">ILLUMINATION</h3><p class="terminal">Plato's cave, but the shadow learned your name.</p></article>
-      <article class="archive-card"><span class="archive-type pixel">SERIAL HORROR</span><h3 class="pixel">NO... MOMENTUM</h3><p class="terminal">A tiny impossible event expands until the world refuses to move correctly.</p></article>
-      <article class="archive-card"><span class="archive-type pixel">SHORT</span><h3 class="pixel">FLY LITTLE CHILD</h3><p class="terminal">A game bug becomes accidental opera.</p></article>
-      <article class="archive-card"><span class="archive-type pixel">GAMEPLAY</span><h3 class="pixel">AMENTI</h3><p class="terminal">Egyptian horror, cursed spaces, and a man negotiating with bad decisions.</p></article>
-      <article class="archive-card"><span class="archive-type pixel">GAMEPLAY</span><h3 class="pixel">ECLIPSIUM</h3><p class="terminal">Mirrors, mazes, hallucinations, and commentary drifting into ritual logic.</p></article>
-      <article class="archive-card"><span class="archive-type pixel">AI / ADS</span><h3 class="pixel">DECODE THE SIGNAL</h3><p class="terminal">Prompting, interaction design, and meaning as a live process instead of dead output.</p></article>
-    </div>
-  </section>
+    <p class="terminal" style="text-align:center; margin:20px 0; color:#ccc;">
+      Archive grid continues below: Illumination · No... Momentum · Fly Little Child · Amenti · Eclipsium
+    </p>
+    <!-- Add more archive cards here later -->
+  </div>
 
-  <section class="signals-section">
-    <div class="signals-section-title pixel">WHO IS SENDING THIS?</div>
-    <div class="signal-two-col">
-      <article class="signal-copy-card">
-        <h3 class="pixel">THE VOICE</h3>
-        <p class="terminal">I am Giuliano Comperato: storyteller, former lecturer, AI interaction designer, and philosophical gamer based in Singapore. Signals from the Void is where horror stories, gameplay, voice experiments, AI tools, and meaning systems collide.</p>
-      </article>
-      <article class="signal-copy-card">
-        <h3 class="pixel">WHY INSIDE CANORNOT?</h3>
-        <p class="terminal">CanOrNot asks whether your input works. Signals from the Void asks what answers back. One is the tool. The other is the chamber behind the tool.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="signal-footer">
-    <h2 class="pixel">FOLLOW THE SIGNAL</h2>
-    <p class="terminal">New transmissions appear on YouTube. Some are stories. Some are games. Some should probably not have escaped the cave.</p>
-    <div class="signals-actions" style="justify-content:center;">
-      <a class="signals-btn pixel" href="https://www.youtube.com/results?search_query=Signals+from+the+Void+Giuliano+Comperato" target="_blank" rel="noopener">YOUTUBE</a>
-      <a class="signals-btn secondary pixel" href="https://www.linkedin.com/search/results/all/?keywords=Giuliano%20Comperato" target="_blank" rel="noopener">LINKEDIN</a>
-      <a class="signals-btn secondary pixel" href="#home" data-open-home>CANORNOT HOME</a>
-    </div>
-  </section>
 </section>
 
 </main>
