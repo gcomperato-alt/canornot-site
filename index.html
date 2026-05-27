@@ -1274,8 +1274,8 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
 }
 .featured-transmission{
   display:grid;
-  grid-template-columns:1.2fr .8fr;
-  gap:18px;
+  grid-template-columns:1.35fr 1fr;
+  gap:20px;
   align-items:stretch;
   margin-top:14px;
 }
@@ -1289,7 +1289,15 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
     linear-gradient(135deg,#111,#24170f 48%,#070711);
   color:#FFF4A8;
   text-align:center;
-  padding:22px;
+  padding:0;
+  overflow:hidden;
+  position:relative;
+}
+.video-placeholder iframe{
+  width:100%;
+  height:310px;
+  display:block;
+  border:0;
 }
 .video-placeholder strong{
   display:block;
@@ -1305,20 +1313,22 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   color:#F5F5DC;
 }
 .feature-copy{
-  padding:18px;
+  padding:22px;
+  background:rgba(20,10,5,0.95);
+  border:2px solid #662222;
 }
 .feature-copy h3{
-  margin:0 0 10px;
+  margin:0 0 12px 0;
   font-size:13px;
   line-height:1.5;
-  color:#FFF4A8;
+  color:#ffcc66;
   font-weight:normal;
 }
 .feature-copy p{
   margin:0 0 14px;
   font-size:23px;
-  line-height:1.12;
-  color:#F5F5DC;
+  line-height:1.15;
+  color:#f5d5aa;
 }
 .archive-grid{
   display:grid;
@@ -1373,6 +1383,9 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .signal-two-col{
     grid-template-columns:1fr;
   }
+  .video-placeholder iframe{
+    height:260px;
+  }
   .signal-door-grid,
   .archive-grid{
     grid-template-columns:1fr;
@@ -1385,7 +1398,7 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
   .signals-hero-copy{padding:20px 18px;}
   .signals-title{font-size:22px;}
   .signals-subtitle,.signals-intro{font-size:21px;}
-  .video-placeholder{min-height:230px;}
+  .video-placeholder{min-height:260px;}
 }
 
 </style>
@@ -1678,16 +1691,26 @@ display:flex; align-items:center; gap:12px; padding:9px 13px; border:2px solid v
     <div class="signals-section-title pixel">FEATURED TRANSMISSION</div>
     <div class="featured-transmission">
       <div class="video-placeholder">
-        <div><strong class="pixel">YOUTUBE EMBED GOES HERE</strong><span>Start with the video that says: this is not normal internet noise.</span></div>
+        <iframe
+          id="amentiEmbed"
+          width="100%"
+          height="310"
+          src="https://www.youtube.com/embed/vb2-x7I_6Zk?start=1543"
+          title="AMENTI Walkthrough - Signals from the Void"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
       </div>
       <div class="signals-panel feature-copy">
-        <h3 class="pixel">RECOMMENDED ENTRY POINT</h3>
-        <p class="terminal">This is where horror, game logic, voice, and strange commentary begin to merge into one signal.</p>
-        <p class="terminal">Replace the placeholder with your strongest YouTube embed. For now this section is ready as the landing pad.</p>
-        <div class="signals-actions">
-          <a class="signals-btn pixel" href="https://www.youtube.com/results?search_query=Signals+from+the+Void+Giuliano+Comperato" target="_blank" rel="noopener">WATCH ON YOUTUBE</a>
-          <a class="signals-btn secondary pixel" href="https://www.youtube.com/results?search_query=Giuliano+Comperato+Signals+from+the+Void" target="_blank" rel="noopener">FIND THE CHANNEL</a>
+        <h3 class="pixel">FEATURED TRANSMISSION</h3>
+        <p class="terminal"><strong>AMENTI</strong><br>Deep dive into one of the strangest signals yet.</p>
+        <div class="signals-actions" style="margin-top:24px; display:flex; flex-wrap:wrap; gap:12px;">
+          <a class="signals-btn pixel" href="https://www.youtube.com/watch?v=vb2-x7I_6Zk" target="_blank" rel="noopener" style="background:#3a0f0f; color:#ffdd88;">▶ WATCH FULL WALKTHROUGH</a>
+          <a class="signals-btn secondary pixel" href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener">LISTEN TO STORIES</a>
+          <a class="signals-btn secondary pixel" href="https://www.youtube.com/@SignalfromtheVoid" target="_blank" rel="noopener">WATCH GAMEPLAY</a>
         </div>
+        <small class="terminal" style="color:#aa9988; display:block; margin-top:16px; font-size:18px; line-height:1.1;">Signal Type: Narrative Horror • Length: Long-form</small>
       </div>
     </div>
   </section>
